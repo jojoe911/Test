@@ -679,8 +679,29 @@ end)
 
 local Dbzfs = {}
 
+function Dbzfs.getWaypoints()
+	return {
+		['536102540'] = { -- Earth
+			{Name = 'goku', Coords = "-5947, 22, -4230"},
+			{Name = 'satan', Coords = "-5788, 140, -2759"},
+			{Name = 'central', Coords = "-3445, 23, -1696"},
+			{Name = 'west', Coords = "-571, 23, -2885"},
+			{Name = 'south', Coords = "-456, 28, -6411"},
+			{Name = 'top', Coords = "2508, 3945, -2033"},
+			{Name = 'hardtop', Coords = "2509, 3945, -2520"},
+			{Name = 'broly', Coords = "2756, 3945, -2273"},
+			{Name = 'korin', Coords = "-3901, 24, -2044"},
+			{Name = 'namekship', Coords = "1412, 94, 3219"},
+			{Name = 'spaceship', Coords = "-1178, 23, -2928"},
+			{Name = 'timeship', Coords = "787, 23, -1801"},
+			{Name = 'kai', Coords = "-3015, 24, -1895"},
+			{Name = 'wormhole', Coords = "2656, 3945, -2517"}
+		}
+	}
+end
+
 function Dbzfs.getWorlds()
-	local Places = {
+	return {
 		['Earth'] = 536102540,
 		['Namek'] = 882399924,
 		['Space'] = 478132461,
@@ -709,6 +730,20 @@ end
 function Dbzfs.getChat()
 	local HUD = User.PlayerGui:FindFirstChild('HUD')
 	return HUD:FindFirstChild("ChatGui", true) 
+end
+
+function Dbzfs.findWaypoint(name)
+	local placeId = tostring(game.PlaceId)
+	local waypoints = Dbzfs.getWaypoints()
+	
+	local list = waypoints[placeId]
+	if not list then return nil end
+	
+	for _, Waypoint in waypoints do
+		if Waypoint.Name:lower() == name:lower() then
+			return Waypoint
+		end
+	end
 end
 
 -- [[ Helper ]]
@@ -893,7 +928,38 @@ end
 Executor.new({
 	Name = "Waypoint",
 	Description = "Edit or teleport to waypoints.",
-	Parameters = {`<action: add | remove | >`}
+	Parameters = {`<action: add | remove | name>`, `<name?>`},
+	Callback = function(self, context, args)
+		local action = args[1]
+		
+		if context == "hint" then
+			
+			local inputType
+			for _, input in {"add", "remove"} do
+				input = input:lower()
+				if input:sub(1, #action) == action:lower() then
+					inputType = input
+				end				
+			end
+			
+			if not inputType then
+				
+				return
+			end
+			
+			if inputType == "add" then
+
+			elseif inputType == "" then
+			
+			end
+			
+		else
+			
+			
+			
+		end
+		
+	end,
 })
 
 Executor.new({
@@ -913,7 +979,7 @@ Executor.new({
 			local inputType
 			for _, input in {"on", "off"} do
 				input = input:lower()
-				if input:sub(1, #args[1]) == string.lower(args[1]) then
+				if input:sub(1, #action) == action:lower() then
 					inputType = input
 				end				
 			end
@@ -982,9 +1048,19 @@ Executor.new({
 	Description = "Teleport to another world.",
 	Parameters = {`<world: name>`},
 	Callback = function(self, context, args)
-		if context == "hint" then
-			local name = args[1]
-			
+		local name = args[1]
+		local worlds = Dbzfs.getWorlds()
+		
+		for world, placeId in worlds do
+			local world = world:lower()
+			if world:sub(1, #name) == name:lower() then
+				if context == "hint" then
+					return {world}
+				else
+					Service.TeleportService:Teleport(placeId, User)
+					return `Teleporting to {world}!`, true
+				end
+			end
 		end
 	end,
 })
@@ -1368,7 +1444,7 @@ Executor.new({
 if Service.RunService:IsStudio() then return end
 
 game.StarterGui:SetCore("SendNotification", {
-	Title = "Test";
+	Title = "Test 1";
 	Text = "Test loaded";
 	Duration = 5;
 })
