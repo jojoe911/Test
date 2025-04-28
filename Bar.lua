@@ -696,7 +696,12 @@ function Dbzfs.getWaypoints()
 			{Name = 'timeship', Coords = "787, 23, -1801"},
 			{Name = 'kai', Coords = "-3015, 24, -1895"},
 			{Name = 'wormhole', Coords = "2656, 3945, -2517"}
-		}
+		},
+		['882399924'] = {},
+		['478132461'] = { -- Space
+			{Name = 'frieza', Coords = "10817, 1335, 3681"}
+		},
+		['569994010'] = {},
 	}
 end
 
@@ -732,16 +737,22 @@ function Dbzfs.getChat()
 	return HUD:FindFirstChild("ChatGui", true) 
 end
 
-function Dbzfs.findWaypoint(name)
+function Dbzfs.findWaypoint(str)
 	local placeId = tostring(game.PlaceId)
 	local waypoints = Dbzfs.getWaypoints()
 	
 	local list = waypoints[placeId]
 	if not list then return nil end
 	
-	for _, Waypoint in waypoints do
-		if Waypoint.Name:lower() == name:lower() then
-			return Waypoint
+	for _, Waypoint in list do
+		local Name = Waypoint.Name:lower()
+		local str = str:lower()
+		
+		if Name:sub(1, #str) == str:lower() then
+			local Coords = Waypoint.Coords:split(",")
+			local Vector = Vector3.new(tonumber(Coords[1]), tonumber(Coords[2]), tonumber(Coords[3]))
+			
+			return Name, Vector
 		end
 	end
 end
@@ -931,34 +942,43 @@ Executor.new({
 	Parameters = {`<action: add | remove | name>`, `<name?>`},
 	Callback = function(self, context, args)
 		local action = args[1]
-		
-		if context == "hint" then
-			
-			local inputType
-			for _, input in {"add", "remove"} do
-				input = input:lower()
-				if input:sub(1, #action) == action:lower() then
-					inputType = input
-				end				
-			end
-			
-			if not inputType then
-				
-				return
-			end
-			
-			if inputType == "add" then
 
-			elseif inputType == "" then
-			
-			end
-			
-		else
-			
-			
-			
+		local inputType
+		for _, input in {"add", "remove"} do
+			input = input:lower()
+			if input:sub(1, #action) == action:lower() then
+				inputType = input
+			end				
 		end
 		
+		if not inputType then inputType = "teleport" end
+		if inputType == "add" then
+			if context == "hint" then
+				return {}, {`unable to add waypoints at the moment`}, {[2] = true}
+			end
+		elseif inputType == "remove" then
+			if context == "hint" then
+				return {}, {`unable to remove waypoints at the moment`}, {[2] = true}
+			end
+		elseif inputType == "teleport" then
+			local name = action
+			local waypoint, coords = Dbzfs.findWaypoint(name)
+			if not waypoint then
+				if context == "hint" then
+					return {}, {`unable to find waypoint`}, {[2] = true}
+				end
+				return `Unable to find waypoint.`, false
+			else
+				if context == "hint" then
+					return {waypoint}, {}, {[2] = true}
+				end
+				local Character = User.Character
+				local Root = Character and Character:FindFirstChild("HumanoidRootPart")
+				if not Root then return `Unable to teleport.`, false end
+				Helper.tween(Root, User:DistanceFromCharacter(coords) / 4000, {CFrame = CFrame.new(coords)})
+				return `Teleporting to waypoint.`, true
+			end
+		end
 	end,
 })
 
@@ -1443,7 +1463,7 @@ Executor.new({
 if Service.RunService:IsStudio() then return end
 
 game.StarterGui:SetCore("SendNotification", {
-	Title = "Test 2";
+	Title = "Test 3";
 	Text = "Test loaded";
 	Duration = 5;
 })
