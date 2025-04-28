@@ -791,10 +791,13 @@ function Helper.findPlayer(name: string)
 	for i, v in List do
 		if not v.Character then continue end
 		if string.match(v.Name:lower(), name:lower()) or string.match(v.DisplayName:lower(), name:lower()) then
+			if v.Name == User.Name then continue end
 			local Root = Helper.getRoot(v.Character)
 			if Root then return v.Character end
 		end
 	end
+	
+	return
 end
 
 function Helper.findMob(name: string, index: number)
