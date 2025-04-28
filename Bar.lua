@@ -316,6 +316,8 @@ do
 end
 
 local User = Service.Players.LocalPlayer
+local Mouse = User:GetMouse()
+local Camera = workspace.CurrentCamera
 
 local Admin = Converted._Admin
 local Holder = Converted._Holder
@@ -1015,6 +1017,153 @@ function Executor.cleanUp()
 end
 
 Executor.new({
+	Name = "Lockon",
+	Description = "Bind a key for lockon.",
+	Parameters = {`<keybind: key>`},
+	Callback = function(self, context, args)
+		if context == "hint" then return end
+		if self.Active then return `Lockon already enabled. Key: {self.Keybind}`, false end
+		
+		local Key = args[1] and Enum.KeyCode[args[1]:upper()]
+		if args[1]:len() > 1 or not Key then return `Invalid key`, false end
+
+		self.Keybind = Key
+		self.Target = nil
+		
+		local Toggle
+		Toggle = Service.UserInputService.InputBegan:Connect(function(input, proc)
+			if proc then return end
+			if input.KeyCode == Key then
+				
+				local Character = User.Character
+				local Root = Character and Character:FindFirstChild("HumanoidRootPart")
+				if not Root then return end
+				
+				self.Lock = not self.Lock
+				if self.Lock then
+					for i, v in workspace.Live:GetChildren() do
+						if v.Name == User.Name then continue end
+						
+						local Target = v
+						local tHum = Target:FindFirstChild("Humanoid")
+						local tRoot = Target:FindFirstChild("HumanoidRootPart")
+						
+						if not tRoot or not tHum or tHum.Health <= 0.1 then continue end
+						local Magnitude = (Camera.CFrame.lookVector - CFrame.new(Camera.CFrame.p, tRoot.Position).lookVector).Magnitude
+						
+						if Magnitude > 0.1 or (Root.Position - tRoot.Position).magnitude > 300 then continue end
+						self.Target = v
+					end
+					if not self.Target then self.Lock = false end
+				else
+					self.Target = nil
+				end
+			end
+		end)
+		
+		local Loop
+		Loop = Service.RunService.RenderStepped:Connect(function()
+			if not User.Character then return end
+			local Humanoid = User.Character:FindFirstChild("Humanoid")
+			if not Humanoid then return end
+			
+			if self.Lock then
+				if self.Target and self.Target.Humanoid and self.Target.Humanoid.Health > 1 then
+					Humanoid.CameraOffset = Vector3.new(2.5, 1, 0)
+					Camera.CFrame = CFrame.new(Camera.CFrame.p, self.Target.HumanoidRootPart.Position)
+				else
+					self.Lock = false
+					self.Target = nil
+				end
+			end
+		end)
+		
+		self.Connect(Loop)
+		self.Connect(Toggle)
+		
+		return `Lockon enabled`, true
+	end,
+})
+
+Executor.new({
+	Name = "Kai",
+	Description = "Buy from elder kai.",
+	Parameters = {`<amount: number?>`},
+	Callback = function(self, context, args)
+		local Amount = args[1] and tonumber(args[1])
+
+		if context == "hint" then
+			if not Amount then
+				Amount = 1
+			end
+			return {Amount}
+		else
+			Amount = (typeof(Amount) == "number" and Amount > 0 and Amount) or 1
+		end
+
+		local Position = 1
+		local Kai = workspace.FriendlyNPCs["Elder Kai"]
+
+		local Character = User.Character
+		local Root = Character and Character:FindFirstChild("HumanoidRootPart")
+		local CF = Root and Root.CFrame
+		if not Root then return `Unable to change slots.`, false end
+
+		local ChatGui = Dbzfs.getChat()
+		local Remotes = Dbzfs.getRemotes()
+
+		local Label = ChatGui.TextLabel
+		local Start = Remotes.Start
+		local Advance = Remotes.Advance
+
+		local Lines = {
+			[1] = "Hey I can unlock your potential a bit for 10,000 Zenni",
+			[2] = "Sound like a deal kid?",
+			[3] = "Alright hand it over",
+			[4] = "Good good... here we go"
+		}
+
+		local Options = {
+			[1] = {
+				[1] = "k"
+			},
+			[2] = {
+				[1] = "Yes"
+			},
+			[3] = {
+				[1] = "k"
+			},
+			[4] = {
+				[1] = "k"
+			}
+		}
+		
+		task.spawn(function()
+			while true do
+				
+				task.wait(0.5)
+				
+				if Amount <= 0 then break end
+				
+				if not ChatGui.Visible then
+					Start:FireServer(Kai)
+				else
+					local Text = Label.Text
+					if Text == Lines[4] then
+						Amount -= 1
+					else
+						Advance:FireServer({Options[Position][1]})
+					end
+				end
+				
+			end
+		end)
+
+		return `Prompting Elder Kai.`, true
+	end,
+})
+
+Executor.new({
 	Name = "Waypoint",
 	Description = "Edit or teleport to waypoints.",
 	Parameters = {`<action: add | remove | name>`, `<name?>`},
@@ -1181,6 +1330,7 @@ Executor.new({
 				if not self.Active then return `Follow is already off.`, true end
 				self.Active = false
 				self.Clean()
+				return `Stopped following.`, true
 			else 
 				return `Invalid input.`, false
 			end
