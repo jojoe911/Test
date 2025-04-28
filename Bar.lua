@@ -1071,7 +1071,7 @@ Executor.new({
 				end
 				return {inputType}, {`no waypoint found`}
 			else
-				if waypoint then
+				if waypoint and name == waypoint then
 					table.remove(Settings.Waypoints[PlaceId], index)
 					if Dbzfs.findWaypoint(name) then
 						writeSave()
@@ -1082,7 +1082,6 @@ Executor.new({
 				else
 					return `Waypoint does not exist.`, false
 				end
-				
 			end
 		elseif inputType == "teleport" then
 			local name = action
@@ -1589,10 +1588,10 @@ Executor.new({
 
 if Service.RunService:IsStudio() then return end
 
+loadSave()
+
 game.StarterGui:SetCore("SendNotification", {
-	Title = "Test 6";
+	Title = "Test 7";
 	Text = "Test loaded";
 	Duration = 5;
 })
-
-loadSave()
