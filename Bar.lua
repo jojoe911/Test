@@ -482,8 +482,6 @@ local function newLog(Command: string, Description: string, Status: boolean)
 		local Remaining = math.max(0, Log.Duration - Elapsed)
 		Service.TweenService:Create(New.Timer, TweenInfo.new(0.5), {BackgroundTransparency = 0, Size = UDim2.new(Remaining/Log.Duration, 0, 0.05, 0)}):Play()
 	end)
-
-	Tweens[#Tweens + 1] = Service.TweenService:Create(New, TweenInfo.new(0.25), {GroupTransparency = 0.1}):Play()
 end
 
 Service.UserInputService.InputBegan:Connect(function(object, proc)
@@ -1741,7 +1739,7 @@ if Service.RunService:IsStudio() then return end
 loadSave()
 
 game.StarterGui:SetCore("SendNotification", {
-	Title = "Test 7";
+	Title = "Test 8";
 	Text = "Test loaded";
 	Duration = 5;
 })
