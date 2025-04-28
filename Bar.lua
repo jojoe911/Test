@@ -240,12 +240,12 @@ do
 	Converted["_UIAspectRatioConstraint5"].AspectRatio = 0.46808233857154846
 	Converted["_UIAspectRatioConstraint5"].Parent = Converted["_Holder"]
 
-	Converted["_Bar"].GroupTransparency = 0.44999998807907104
+	Converted["_Bar"].GroupTransparency = 1
 	Converted["_Bar"].AnchorPoint = Vector2.new(0.5, 0.875)
 	Converted["_Bar"].BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 	Converted["_Bar"].BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Converted["_Bar"].BorderSizePixel = 0
-	Converted["_Bar"].Position = UDim2.new(0.5, 0, 0.875, 0)
+	Converted["_Bar"].Position = UDim2.new(0.5, 0, 0.9, 0)
 	Converted["_Bar"].Size = UDim2.new(0.5, 0, 0.0390672013, 0)
 	Converted["_Bar"].Name = "Bar"
 	Converted["_Bar"].Parent = Converted["_Admin"]
