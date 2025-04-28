@@ -1,12 +1,9 @@
-local Settings = {
-	
-}
-
 local Service = {
 	Players = game:GetService('Players'),
 	TweenService = game:GetService('TweenService'),
 	RunService = game:GetService('RunService'),
 	Debris = game:GetService('Debris'),
+	HttpService = game:GetService("HttpService"),
 	TeleportService = game:GetService('TeleportService'),
 	UserInputService = game:GetService('UserInputService'),
 	ReplicatedStorage = game:GetService('ReplicatedStorage'),
@@ -677,6 +674,8 @@ end)
 
 -- [[ Final Stand Stuff ]]
 
+local Settings = {}
+
 local Dbzfs = {}
 
 function Dbzfs.getWaypoints()
@@ -697,7 +696,10 @@ function Dbzfs.getWaypoints()
 			{Name = 'kai', Coords = "-3015, 24, -1895"},
 			{Name = 'wormhole', Coords = "2656, 3945, -2517"}
 		},
-		['882399924'] = {},
+		['882399924'] = { -- Namek
+			{Name = "guru", Coords = "2469, 529, -2328"},
+			{Name = "cave", Coords = "-1943, 64, -3043"}
+		},
 		['478132461'] = { -- Space
 			{Name = 'frieza', Coords = "10817, 1335, 3681"}
 		},
@@ -739,12 +741,12 @@ end
 
 function Dbzfs.findWaypoint(str)
 	local placeId = tostring(game.PlaceId)
-	local waypoints = Dbzfs.getWaypoints()
+	local waypoints = Settings.Waypoints
 	
 	local list = waypoints[placeId]
 	if not list then return nil end
 	
-	for _, Waypoint in list do
+	for Index, Waypoint in list do
 		local Name = Waypoint.Name:lower()
 		local str = str:lower()
 		
@@ -752,8 +754,81 @@ function Dbzfs.findWaypoint(str)
 			local Coords = Waypoint.Coords:split(",")
 			local Vector = Vector3.new(tonumber(Coords[1]), tonumber(Coords[2]), tonumber(Coords[3]))
 			
-			return Name, Vector
+			return Name, Vector, Index
 		end
+	end
+end
+
+-- [[ Save Data File ]]
+
+function copy<T>(t: T, deep: boolean?): T
+	if not deep then
+		return (table.clone(t :: any) :: any) :: T
+	end
+	local function DeepCopy(tbl: { any })
+		local tCopy = table.clone(tbl)
+		for k, v in tCopy do
+			if type(v) == "table" then
+				tCopy[k] = DeepCopy(v)
+			end
+		end
+		return tCopy
+	end
+	return DeepCopy(t :: any) :: T
+end
+
+function reconcile(source, template)
+	local tbl = table.clone(source)
+
+	for k, v in template do
+		local sv = source[k]
+		if sv == nil then
+			if type(v) == "table" then
+				tbl[k] = copy(v, true)
+			else
+				tbl[k] = v
+			end
+		elseif type(sv) == "table" then
+			if type(v) == "table" then
+				tbl[k] = reconcile(sv, v)
+			else
+				tbl[k] = copy(sv, true)
+			end
+		end
+	end
+
+	return (tbl :: any) :: S & T
+end
+
+local function loadSave()
+	
+	local Template = {
+		Waypoints = Dbzfs.getWaypoints()
+	}
+	
+	local Config
+
+	local Success, Failed = pcall(function()
+		local File = readfile("Supreme.txt")
+		Config = Service.HttpService:JSONDecode(File)
+	end)
+
+	if Success then
+		Settings = reconcile(Config, Template)
+	end
+	
+	writefile("Supreme.txt", Service.HttpService:JSONEncode(Settings))
+end
+
+local function writeSave()
+	local Success, Failed = pcall(function()
+		writefile("Supreme.txt", Service.HttpService:JSONEncode(Settings))
+	end)
+
+	if Success then
+		return Success
+	else
+		return Failed
 	end
 end
 
@@ -951,17 +1026,63 @@ Executor.new({
 			input = input:lower()
 			if input:sub(1, #action) == action:lower() then
 				inputType = input
+				if not args[2] and context == "hint" then
+					return {inputType}
+				end
 			end				
 		end
 		
+		local PlaceId = tostring(game.PlaceId)
+		local Character = User.Character
+		local Root = Character and Character:FindFirstChild("HumanoidRootPart")
 		if not inputType then inputType = "teleport" end
+		
 		if inputType == "add" then
+			local name = args[2]
+			local exists, coords = Dbzfs.findWaypoint(name, Settings)
+			if not name then return end
 			if context == "hint" then
-				return {}, {`unable to add waypoints at the moment`}, {[2] = true}
+				if exists and exists == name then
+					return {inputType}, {`waypoint already exists`}, {[2] = true}
+				end
+				return {inputType, name}
+			end
+			
+			if exists then return `Waypoint already exists.`, false end
+			if not Root then return `Unable to save waypoint.`, false end
+			local Coords = tostring(Root.Position)
+			local Create = {Name = name, Coords = Coords}
+			
+			table.insert(Settings.Waypoints[PlaceId], Create)
+			
+			local Status = writeSave()
+			if Status then
+				return `Created waypoint: {name}`, true
+			else
+				return `Unable to create waypoint.`, true
 			end
 		elseif inputType == "remove" then
+			local name = args[2]
+			local waypoint, coords, index = Dbzfs.findWaypoint(name)
+			if not name then return end
 			if context == "hint" then
-				return {}, {`unable to remove waypoints at the moment`}, {[2] = true}
+				if waypoint then
+					return {inputType, waypoint}
+				end
+				return {inputType}, {`no waypoint found`}
+			else
+				if waypoint then
+					table.remove(Settings.Waypoints[PlaceId], index)
+					if Dbzfs.findWaypoint(name) then
+						writeSave()
+						return `Failed to remove waypoint.`, false
+					else
+						return `Successfully removed waypoint.`, true
+					end
+				else
+					return `Waypoint does not exist.`, false
+				end
+				
 			end
 		elseif inputType == "teleport" then
 			local name = action
@@ -975,8 +1096,6 @@ Executor.new({
 				if context == "hint" then
 					return {waypoint}, {}, {[2] = true}
 				end
-				local Character = User.Character
-				local Root = Character and Character:FindFirstChild("HumanoidRootPart")
 				if not Root then return `Unable to teleport.`, false end
 				Helper.tween(Root, User:DistanceFromCharacter(coords) / 4000, {CFrame = CFrame.new(coords)})
 				return `Teleporting to waypoint.`, true
@@ -1013,8 +1132,8 @@ Executor.new({
 			
 			if inputType == "on" then
 				local t = "true"
-				if not rawName then print("no 2nd arg") return {inputType} end
-				if not target then print("no target found") return {inputType, rawName}, {`no player found`}, {[3] = true} end
+				if not rawName then return {inputType} end
+				if not target then return {inputType}, {`no player found`}, {[3] = true} end
 				if doBean and t:sub(1, #doBean) == string.lower(doBean) then
 					return {inputType, target.Name, "true"}
 				elseif doBean and t:sub(1, #doBean) ~= string.lower(doBean) then
@@ -1032,7 +1151,12 @@ Executor.new({
 				if not target then return `No target found`, false end
 				if self.Active then return `Follow is already on.`, true end
 			
-				if not doBean or doBean ~= "true" then return `Invalid bean input.`, false end
+				if doBean then
+					if doBean ~= "true" then return `Invalid input.`, false end
+					doBean = true
+				else
+					doBean = false
+				end
 				
 				local myRoot = Helper.getRoot(User.Character)
 				local targetRoot = target and Helper.getRoot(target)
@@ -1045,7 +1169,7 @@ Executor.new({
 				local Loop = Service.RunService.RenderStepped:Connect(function()
 					if not self.Active then return end
 					Helper.tween(myRoot, User:DistanceFromCharacter(targetRoot.Position) / 4000, {CFrame = targetRoot.CFrame * CFrame.new(0, 0, 7.5)})
-					if doBean and tick() - Start >= 5 then
+					if doBean and tick() - Start >= 1 then
 						Start = tick()
 						Remotes.EatSenzu:FireServer(' ');
 					end
@@ -1053,7 +1177,7 @@ Executor.new({
 				
 				local _ = self.Connect(Loop)
 				
-				return `Following target: {target.Name}`
+				return `Following target: {target.Name}`, true
 			elseif action == "off" then
 				if not self.Active then return `Follow is already off.`, true end
 				self.Active = false
@@ -1466,7 +1590,9 @@ Executor.new({
 if Service.RunService:IsStudio() then return end
 
 game.StarterGui:SetCore("SendNotification", {
-	Title = "Test 3";
+	Title = "Test 6";
 	Text = "Test loaded";
 	Duration = 5;
 })
+
+loadSave()
