@@ -1005,9 +1005,8 @@ Executor.new({
 			
 		elseif context == "run" then
 			
-			if not target then return `No target found`, false end
-			
 			if action == "on" then
+				if not target then return `No target found`, false end
 				if self.Active then return `Follow is already on.`, true end
 			
 				if not doBean or doBean ~= "true" then return `Invalid bean input.`, false end
@@ -1444,7 +1443,7 @@ Executor.new({
 if Service.RunService:IsStudio() then return end
 
 game.StarterGui:SetCore("SendNotification", {
-	Title = "Test 1";
+	Title = "Test 2";
 	Text = "Test loaded";
 	Duration = 5;
 })
