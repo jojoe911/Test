@@ -1381,7 +1381,7 @@ Executor.new({
 		end
 
 		if context == "hint" then
-			if not target then return {}, {`no target found`} end
+			if not target then return {}, {} end
 			local displayName = target.Name:gsub(" ", "_")
 			
 			if isMob then
@@ -1391,6 +1391,19 @@ Executor.new({
 				return {`{displayName}`}, {}, {[2] = true}
 			end
 		elseif context == "run" then
+			
+			if not target then
+				local Instant = User.Backpack:FindFirstChild("Instant Transmission")
+				if not Instant then return `You do not own Instant Transmission.`, false end
+				Instant.Parent = User.Character
+				Instant:Activate()
+				Instant:Deactivate()
+				User.Backpack.ServerTraits.FakeChat:FireServer(rawName)
+				task.wait(0.2)
+				Instant.Parent = User.Backpack
+				return `Attempting to use Instant Transmission...`, true
+			end
+			
 			local myRoot = Helper.getRoot(User.Character)
 			local targetRoot = target and Helper.getRoot(target)
 			if not myRoot or not targetRoot then return "Unable to teleport.", false end
