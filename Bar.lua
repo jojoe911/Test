@@ -721,7 +721,7 @@ function Dbzfs.getWorlds()
 		['Queue'] = 3565304751,
 		['HTC'] = 882375367,
 		['Broly'] = 2050207304,
-		['HeavenRanked'] = 3618359401
+		['OtherTournament'] = 3618359401
 	}
 end
 
@@ -940,11 +940,12 @@ end
 
 -- [[ Executor ]]
 
-function Executor.new(inputs: {Name: string, Description: string, Parameters: {}, Callback: () -> ()})
+function Executor.new(inputs: {Name: string, Description: string, Parameters: {}, Requirements: {}, Callback: () -> ()})
 	local Command = {
 		['Name'] = inputs.Name,
 		['Description'] = inputs.Description,
 		['Parameters'] = inputs.Parameters or {},
+		['Requirements'] = inputs.Requirements or {},
 		['Callback'] = inputs.Callback,
 		['Connections'] = {},
 		['Active'] = false,
@@ -974,7 +975,10 @@ function Executor.new(inputs: {Name: string, Description: string, Parameters: {}
 		Command.Connections[Index] = event
 		return Index, Command.Connections[Index]
 	end
-
+	
+	local PlaceId = Command.Requirements and Command.Requirements.PlaceId
+	if PlaceId and PlaceId ~= game.PlaceId then return end
+	
 	Library[#Library + 1] = Command
 	table.sort(Library, function(a, b)
 		return a.Name:lower() < b.Name:lower()
@@ -1015,9 +1019,69 @@ function Executor.cleanUp()
 end
 
 Executor.new({
+	Name = "Autotop",
+	Description = "Does auto-top.",
+	Parameters = {`<bean: true?>`},
+	Requirements = {PlaceId = 535527772},
+	Callback = function(self, context, args)
+		if context == "hint" then
+			local input = "true"
+			if input:sub(1, #args[1]) == args[1]:lower() then
+				return {"true"}, {}
+			else
+				return {}, {"invalid input"}
+			end
+		else
+			if self.Active then return `Auto TOP is already running.`, false end
+			self.Active = true
+			
+			local List = {}
+			
+			for _, Mob in workspace.Live:GetChildren() do
+				if Service.Players:GetPlayerFromCharacter(Mob) then continue end
+				local Humanoid = Mob:FindFirstChild("Humanoid")
+				local Root = Mob:FindFirstChild("HumanoidRootPart")
+				if not Root or not Humanoid or Humanoid.Health <= 0.01 then continue end
+				table.insert(List, Mob)
+			end
+			
+			table.sort(List, function(a, b)
+				return a.Name:lower() < b.Name:lower()
+			end)
+			
+			local Loop
+			Loop = Service.RunService.RenderStepped:Connect(function()
+				local Character = User.Character
+				local Root = Character and Character:FindFirstChild("HumanoidRootPart")
+				if not Character or not Root or #List == 0 then 
+					self.Active = false
+					self.Clean()
+					return
+				end
+				
+				local Target = List[1]
+				local tRoot = Target and Target:FindFirstChild("HumanoidRootPart")
+				local tHum = Target and Target:FindFirstChild("Humanoid")
+				if not tRoot or not tHum or tHum.Health <= 0.1 then
+					table.remove(List, 1)
+					return
+				end
+				
+				Helper.tween(Root, User:DistanceFromCharacter(tRoot.Position) / 4000, {CFrame = tRoot.CFrame * CFrame.new(0, 0, 3.5)})
+			end)
+			
+			self.Connect(Loop)
+			
+			return `Running auto-top.`, true
+		end
+	end,
+})
+
+Executor.new({
 	Name = "Lockon",
 	Description = "Bind a key for lockon.",
 	Parameters = {`<keybind: key>`},
+	Requirements = {},
 	Callback = function(self, context, args)
 		if context == "hint" then return end
 		if self.Active then return `Lockon already enabled. Key: {self.Keybind}`, false end
@@ -1067,7 +1131,7 @@ Executor.new({
 			
 			if self.Lock then
 				if self.Target and self.Target.Humanoid and self.Target.Humanoid.Health > 1 then
-					Humanoid.CameraOffset = Vector3.new(2.5, 1, 0)
+					Humanoid.CameraOffset = Vector3.new(1.5, 1.5, 0)
 					Camera.CFrame = CFrame.new(Camera.CFrame.p, self.Target.HumanoidRootPart.Position)
 				else
 					self.Lock = false
@@ -1087,6 +1151,7 @@ Executor.new({
 	Name = "Kai",
 	Description = "Buy from elder kai.",
 	Parameters = {`<amount: number?>`},
+	Requirements = {},
 	Callback = function(self, context, args)
 		local Amount = args[1] and tonumber(args[1])
 
@@ -1164,16 +1229,17 @@ Executor.new({
 Executor.new({
 	Name = "Waypoint",
 	Description = "Edit or teleport to waypoints.",
-	Parameters = {`<action: add | remove | name>`, `<name?>`},
+	Parameters = {`<action: add | remove | list | name>`, `<name?>`},
+	Requirements = {},
 	Callback = function(self, context, args)
 		local action = args[1]
 
 		local inputType
-		for _, input in {"add", "remove"} do
+		for _, input in {"add", "remove", "list"} do
 			input = input:lower()
 			if input:sub(1, #action) == action:lower() then
 				inputType = input
-				if not args[2] and context == "hint" then
+				if not args[2] and context == "hint" and input == "on" or input == "off" then
 					return {inputType}
 				end
 			end				
@@ -1230,6 +1296,15 @@ Executor.new({
 					return `Waypoint does not exist.`, false
 				end
 			end
+		elseif inputType == "list" then
+			if context == "hint" then
+				return {inputType}, {}, {[2] = true}
+			end
+			local list = Settings.Waypoints[PlaceId]
+			for _, v in list do
+				print("Waypoint:", v.Name)
+			end
+			return `View console with "/console" or F9.`, true
 		elseif inputType == "teleport" then
 			local name = action
 			local waypoint, coords = Dbzfs.findWaypoint(name)
@@ -1254,6 +1329,7 @@ Executor.new({
 	Name = "Follow",
 	Description = "Follow a player. Optional beans.",
 	Parameters = {`<action: on | off>`, `<player: name>`, `<bean: true?>`},
+	Requirements = {},
 	Callback = function(self, context, args)
 		local action = args[1]
 		local rawName = args[2]
@@ -1340,19 +1416,32 @@ Executor.new({
 	Name = "World",
 	Description = "Teleport to another world.",
 	Parameters = {`<world: name>`},
+	Requirements = {},
 	Callback = function(self, context, args)
 		local name = args[1]
 		local worlds = Dbzfs.getWorlds()
 		
-		for world, placeId in worlds do
-			local world = world:lower()
-			if world:sub(1, #name) == name:lower() then
-				if context == "hint" then
-					return {world}
-				else
-					Service.TeleportService:Teleport(placeId, User)
-					return `Teleporting to {world}!`, true
+		local world
+		local id
+		for placeName, placeId in worlds do
+			if placeName:lower():sub(1, #name) == name:lower() then
+				world = placeName
+				id = placeId
+			end
+		end
+		
+		if context == "hint" then
+			if world then return {world} end
+			return {}, {`no world found.`}
+		else
+			if world then
+				Service.TeleportService:Teleport(id, User)
+				return `Teleporting to {world}!`, true
+			else
+				for placeName, _ in worlds do
+					print("World:", placeName)
 				end
+				return `No world found. View console for list of worlds.`, false
 			end
 		end
 	end,
@@ -1362,6 +1451,7 @@ Executor.new({
 	Name = "Teleport",
 	Description = "Teleports to an enitity.",
 	Parameters = {"<player: name | mob: @name or @full_name>", "<index: number?>"},
+	Requirements = {},
 	Callback = function(self, context, args)
 		local rawName = args[1]
 		if not rawName and context == "run" then return "Please specify a target", false end
@@ -1417,6 +1507,7 @@ Executor.new({
 	Name = "Slot",
 	Description = "Prompt slot changer.",
 	Parameters = {`<slot: 1-3>`},
+	Requirements = {},
 	Callback = function(self, context, args)
 		local Slot = args[1] and tonumber(args[1])
 		
@@ -1509,6 +1600,7 @@ Executor.new({
 	Name = "Autofarm",
 	Description = "Autofarm mobs.",
 	Parameters = {`<state: on | off>`, `<mob: name or full_name> continue ...`},
+	Requirements = {},
 	Callback = function(self, context, args): Output
 		if context == "hint" then
 			for _, input in {"on", "off"} do
@@ -1640,6 +1732,7 @@ Executor.new({
 	Name = "NoSlow",
 	Description = "Disables movement hinderance.",
 	Parameters = {},
+	Requirements = {},
 	Callback = function(self, context)
 		if context == "hint" then return {}, {} end
 		self.Active = not self.Active
@@ -1684,6 +1777,7 @@ Executor.new({
 	Name = "Rejoin",
 	Description = "Rejoin the current server.",
 	Parameters = {`<delay: number?>`},
+	Requirements = {},
 	Callback = function(self, context, args)
 		if context == "hint" then return {}, {} end
 		local Time = (args[1] and tonumber(args[1]))
@@ -1702,6 +1796,7 @@ Executor.new({
 	Name = "Reset",
 	Description = "Resets your character.",
 	Parameters = {`<savepos: true?>`},
+	Requirements = {},
 	Callback = function(self, context, args)
 		if context == "hint" then
 			local input = "true"
@@ -1737,6 +1832,7 @@ Executor.new({
 	Name = "Help",
 	Description = "Shows a list of commands.",
 	Parameters = {},
+	Requirements = {},
 	Callback = function(self, context, args)
 		if context == "hint" then return {}, {} end
 		for _, Command in Library do
@@ -1753,6 +1849,6 @@ loadSave()
 
 game.StarterGui:SetCore("SendNotification", {
 	Title = "Test 8";
-	Text = "Test loaded";
+	Text = "5/1/2025 09:13";
 	Duration = 5;
 })
