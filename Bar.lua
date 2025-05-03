@@ -1,5 +1,5 @@
 local BAR_VERSION = "1.0"
-local BAR_TIME = "5/3/2025 12:43 HST"
+local BAR_TIME = "5/3/2025 13:03 HST"
 
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
@@ -523,7 +523,7 @@ Service.UserInputService.InputBegan:Connect(function(object, proc)
 		Input.Text = Log.History[Log.Order] or ""
 		Input.CursorPosition = 1020
 	elseif object.KeyCode == Enum.KeyCode.Tab then
-		if Log.Tabbed then return end
+		if Log.Tabbed or not Input:IsFocused() then return end
 		Log.Tabbed = true
 		task.wait(0.01)
 		if Log.Position == 0 then
@@ -889,7 +889,7 @@ function Helper.findPlayer(name: string)
 		if string.match(v.Name:lower(), name:lower()) or string.match(v.DisplayName:lower(), name:lower()) then
 			if v.Name == User.Name then continue end
 			local Root = Helper.getRoot(v.Character)
-			if Root then return v.Character end
+			if Root then return v, v.Character end
 		end
 	end
 	
@@ -1258,9 +1258,12 @@ Executor.new({ -- Protect
 		if not args[1] and context == "run" then return `No target found.`, false end
 		
 		local Protecting = args[1]
-		local Range = args[2] or 100
+		local Range = args[2] and tonumber(args[2])
+		if not Range or typeof(Range) ~= "number" then
+			Range = 100
+		end
 
-		local pPlayer = Helper.findPlayer(Protecting)
+		local pPlayer, pCharacter = Helper.findPlayer(Protecting)
 		
 		if context == "hint" then
 			if pPlayer then 
@@ -1272,9 +1275,7 @@ Executor.new({ -- Protect
 			
 			if self.Active then return `Protect already enabled. Unprotect to disable.`, false end
 			
-			if not pPlayer then return `No target found.`, false end
-			
-			local pCharacter = pPlayer and pPlayer.Character
+			if not pCharacter or not pPlayer then return `No target found.`, false end
 			local pRoot = pCharacter and pCharacter:FindFirstChild("HumanoidRootPart")
 
 			local Character = User and User.Character
@@ -1315,7 +1316,7 @@ Executor.new({ -- Protect
 						if game.Players:GetPlayerFromCharacter(tModel) then continue end
 						if pPlayer:DistanceFromCharacter(tRoot.Position) > Range then continue end 
 
-						if Damagers:FindFirstChild(Protecting) and not table.find(Enemies, tModel) then
+						if Damagers:FindFirstChild(pPlayer.Name) and not table.find(Enemies, tModel) then
 							table.insert(Enemies, tModel)
 						end
 
@@ -1351,6 +1352,7 @@ Executor.new({ -- Protect
 				end
 			end)
 			
+			self.Connect(Loop)
 			return `Protect has been enabled.`, true
 		end
 		
@@ -1743,8 +1745,8 @@ Executor.new({ -- Follow
 		local doBean = args[3]
 
 		local path = Service.Players
-		local searchName = rawName and rawName:gsub("_", " "):lower()
-		local target = searchName and Helper.findPlayer(searchName)
+		local searchName = (rawName and rawName:gsub("_", " "):lower() or "")
+		local _, target = Helper.findPlayer(searchName)
 
 		if context == "hint" then
 			local inputType
@@ -1867,13 +1869,14 @@ Executor.new({ -- Teleport
 		local searchName = isMob and rawName:sub(2):gsub("_", " "):lower() or rawName:gsub("_", " "):lower()
 		local index = tonumber(args[2] or 1)
 		
+		local _
 		local target
 		local amount = 0
 		
 		if isMob then
 			target, amount = Helper.findMob(searchName, index)
 		else
-			target = Helper.findPlayer(searchName)
+			_, target = Helper.findPlayer(searchName)
 			if target then amount = 1 end
 		end
 
