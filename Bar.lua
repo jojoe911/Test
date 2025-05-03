@@ -1,3 +1,6 @@
+local BAR_VERSION = "1.0"
+local BAR_TIME = "5/3/2025 12:43 HST"
+
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
 	Players = game:GetService('Players'),
@@ -1036,6 +1039,49 @@ function Executor.cleanUp()
 	end
 end
 
+Executor.new({ -- Clip
+	Name = "Clip",
+	Description = "Enables collisions in your character.",
+	Parameters = {},
+	Requirements = {},
+	Callback = function(self, context)
+		if context == "hint" then return end
+		local Command = Executor.get("Noclip")
+		if not Command then return `Unable to run command.`, false end
+		Command.Clean()
+		return `Noclip has been disabled.`, true
+	end,
+})
+
+Executor.new({ -- Noclip
+	Name = "Noclip",
+	Description = "Disables collisions in your character.",
+	Parameters = {},
+	Requirements = {},
+	Callback = function(self, context)
+		if context == "hint" then return end
+		if self.Active then return `Noclip already enabled.`, false end
+		self.Active = true
+		
+		self.Origin = {}
+		
+		local Loop
+		Loop = Service.RunService.RenderStepped:Connect(function()
+			if not self.Active then return end
+			local Character = User.Character
+			if not Character then return end
+			for _, v in Character:GetDescendants() do
+				pcall(function()
+					v.CanCollide = false
+				end)
+			end
+		end)
+		
+		self.Connect(Loop)
+		return `Noclip enabled.`, true
+	end,
+})
+
 Executor.new({ -- Stat
 	Name = "Stat",
 	Description = "Infinity.",
@@ -1086,6 +1132,7 @@ Executor.new({ -- Stat
 			local Loops = {}
 			local lastTick = tick()
 			local lastPoints = 0
+			local lastRace
 			
 			local totalMisses = 0
 			
@@ -1110,7 +1157,7 @@ Executor.new({ -- Stat
 				local Chat = Dbzfs.getChat()
 				local Label = Chat:FindFirstChild("TextLabel")
 				
-				if Race.Value ~= "Namekian" then
+				if Race.Value ~= "Namekian" and lastRace ~= Race.Value then
 					local coolOff = tick()
 					local Points = Dbzfs.getSkillPoints()
 					repeat task.wait() until Points.Text ~= "0" or tick() - coolOff >= 3
@@ -1127,6 +1174,7 @@ Executor.new({ -- Stat
 				local Completed = false
 				local Ready = false
 				local Switch = (Race.Value == "Namekian" and Slots.Target) or Slots.Namekian
+				lastRace = Race.Value
 
 				repeat
 					Start:FireServer(Baba)
@@ -2206,7 +2254,7 @@ if Service.RunService:IsStudio() then return end
 loadSave()
 
 game.StarterGui:SetCore("SendNotification", {
-	Title = "Test 9";
-	Text = "5/3/2025 09:46 HST";
+	Title = BAR_VERSION;
+	Text = BAR_TIME;
 	Duration = 5;
 })
