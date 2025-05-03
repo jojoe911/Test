@@ -1,4 +1,5 @@
 local Service = {
+	VirtualUser = game:GetService("VirtualUser"),
 	Players = game:GetService('Players'),
 	TweenService = game:GetService('TweenService'),
 	RunService = game:GetService('RunService'),
@@ -389,17 +390,19 @@ local function normalizeText(text)
 	return text
 end
 
-local function newLog(Command: string, Description: string, Status: boolean)
+local function newLog(Title: string, Description: string, Status: boolean, notifOnly: boolean?)
+	
+	if not notifOnly then
+		local Previous = Log.History[1]
+		if Previous and Previous ~= Title and Status then
+			table.insert(Log.History, 1, Title)
 
-	local Previous = Log.History[1]
-	if Previous and Previous ~= Command and Status then
-		table.insert(Log.History, 1, Command)
-
-		if #Log.History > 30 then
-			table.remove(Log.History, 31)
+			if #Log.History > 30 then
+				table.remove(Log.History, 31)
+			end
+		elseif not Previous then
+			table.insert(Log.History, 1, Title)
 		end
-	elseif not Previous then
-		table.insert(Log.History, 1, Command)
 	end
 
 	local Start = tick()
@@ -408,48 +411,52 @@ local function newLog(Command: string, Description: string, Status: boolean)
 	local Debounce = false
 	local New = Template:Clone()
 	
-	New.Name = Command
-	New.Command.Text = Command
+	New.Name = Title
+	New.Command.Text = Title
 	New.Description.Text = Description
-	New.Completed.Visible = Status
-	New.Errored.Visible = not Status
-	New.Unpin.Visible = true
 	New.Visible = true
 	New.Parent = History
 	
-	New.Activator.MouseButton1Click:Connect(function()
-		if Disappearing or Debounce then return end
-		Debounce = true
-		local Result = Executor.run(Command)
-		if Result == nil then Debounce = false return end
-		newLog(Command, Result.Description, Result.Status, Result.Pinnable)
-		Debounce = false
-	end)
+	if not notifOnly then
+		
+		New.Unpin.Visible = true
+		New.Completed.Visible = Status
+		New.Errored.Visible = not Status
+		
+		New.Activator.MouseButton1Click:Connect(function()
+			if Disappearing or Debounce then return end
+			Debounce = true
+			local Result = Executor.run(Title)
+			if Result == nil then Debounce = false return end
+			newLog(Title, Result.Description, Result.Status, Result.Pinnable)
+			Debounce = false
+		end)
 
-	New.Pinner.MouseButton1Click:Connect(function()
-		if Disappearing then return end
-		local isPinned = table.find(Log.Pinned, New)
-		if isPinned then
-			table.remove(Log.Pinned, isPinned)
-			New.Pin.Visible = false
-			New.Unpin.Visible = true
-			New.LayoutOrder = 0
-		else
-			table.insert(Log.Pinned, New)
-			New.Pin.Visible = true
-			New.LayoutOrder = 1
-		end
-	end)
+		New.Pinner.MouseButton1Click:Connect(function()
+			if Disappearing then return end
+			local isPinned = table.find(Log.Pinned, New)
+			if isPinned then
+				table.remove(Log.Pinned, isPinned)
+				New.Pin.Visible = false
+				New.Unpin.Visible = true
+				New.LayoutOrder = 0
+			else
+				table.insert(Log.Pinned, New)
+				New.Pin.Visible = true
+				New.LayoutOrder = 1
+			end
+		end)
 
-	New.MouseEnter:Connect(function()
-		if Disappearing then return end
-		Tweens[#Tweens + 1] = Service.TweenService:Create(New, TweenInfo.new(0.5), {GroupTransparency = 0}):Play()
-	end)
+		New.MouseEnter:Connect(function()
+			if Disappearing then return end
+			Tweens[#Tweens + 1] = Service.TweenService:Create(New, TweenInfo.new(0.5), {GroupTransparency = 0}):Play()
+		end)
 
-	New.MouseLeave:Connect(function()
-		if Disappearing then return end
-		Tweens[#Tweens + 1] = Service.TweenService:Create(New, TweenInfo.new(0.5), {GroupTransparency = 0.1}):Play()
-	end)
+		New.MouseLeave:Connect(function()
+			if Disappearing then return end
+			Tweens[#Tweens + 1] = Service.TweenService:Create(New, TweenInfo.new(0.5), {GroupTransparency = 0.1}):Play()
+		end)
+	end
 
 	local Timer
 	Timer = Service.RunService.RenderStepped:Connect(function()
@@ -542,6 +549,7 @@ Service.UserInputService.InputBegan:Connect(function(object, proc)
 end)
 
 Input.FocusLost:Connect(function(enterPressed: boolean, inputThatCausedFocusLoss: InputObject) 
+	Log.Guess = {Command = "", Hints = {}}
 	cleanTweens()
 	updateGuess("")
 	local Index = #Log.Tweens + 1
@@ -734,12 +742,22 @@ function Dbzfs.getRemotes()
 	}
 end
 
+function Dbzfs.getHUD()
+	return User.PlayerGui:WaitForChild('HUD')
+end
+
 function Dbzfs.getChat()
-	local HUD = User.PlayerGui:FindFirstChild('HUD')
+	local HUD = Dbzfs.getHUD()
 	return HUD:FindFirstChild("ChatGui", true) 
 end
 
+function Dbzfs.getSkillPoints()
+	local HUD = Dbzfs.getHUD()
+	return HUD:FindFirstChild("Val", true)
+end
+
 function Dbzfs.findWaypoint(str)
+	if not str then return end
 	local placeId = tostring(game.PlaceId)
 	local waypoints = Settings.Waypoints
 	
@@ -1018,7 +1036,366 @@ function Executor.cleanUp()
 	end
 end
 
-Executor.new({
+Executor.new({ -- Stat
+	Name = "Stat",
+	Description = "Infinity.",
+	Parameters = {`<state: on | off>`, `<target: number>`, `<namekian: slot>`},
+	Requirements = {},
+	Callback = function(self, context, args)
+		local state = args[1]
+		local targetSlot = (args[2] and tonumber(args[2]))
+		local namekSlot = (args[3] and tonumber(args[3]))
+		
+		if context == "hint" then
+			for _, input in {"on", "off"} do
+				input = input:lower()
+				if input:sub(1, #state) == state:lower() then
+					if input == "off" then
+						return {input}, {}, {[2] = true, [3] = true}
+					else
+						if args[3] then
+							if not namekSlot or typeof(namekSlot) ~= "number" then
+								return {input, targetSlot}, {`invalid arg`}
+							end
+							return {input, tostring(targetSlot), tostring(namekSlot)}
+						end
+						if args[2] then
+							if not targetSlot or typeof(targetSlot) ~= "number" then
+								return {input}, {`invalid arg`}, {[3] = true}
+							end
+							return {input, tostring(targetSlot)}
+						end
+						return {input}, {}
+					end
+				end
+			end
+			return {}, {'invalid input'}
+		end
+		
+		if state == "on" then
+			if self.Active then return `Stat is already enabled.`, false end
+			
+			local Slots = {
+				["Target"] = `Slot{targetSlot}`,
+				["Namekian"] = `Slot{namekSlot}`
+			}
+			
+			local Baba = workspace.FriendlyNPCs["Character Slot Changer"]
+			local Kami = workspace.FriendlyNPCs.KAMI
+
+			local Loops = {}
+			local lastTick = tick()
+			local lastPoints = 0
+			
+			local totalMisses = 0
+			
+			local Added
+			Added = User.CharacterAdded:Connect(function(Character)
+				if not self.Active then return end
+				lastTick = tick()
+
+				if #Loops > 0 then
+					for i, v in Loops do
+						Loops[i]:Disconnect()
+						Loops[i] = nil
+					end
+				end
+
+				local Race = Character:WaitForChild("Race")
+				
+				local Remotes = Dbzfs.getRemotes()
+				local Start = Remotes.Start
+				local Advance = Remotes.Advance
+				
+				local Chat = Dbzfs.getChat()
+				local Label = Chat:FindFirstChild("TextLabel")
+				
+				if Race.Value ~= "Namekian" then
+					local coolOff = tick()
+					local Points = Dbzfs.getSkillPoints()
+					repeat task.wait() until Points.Text ~= "0" or tick() - coolOff >= 3
+					Points = (Points and tonumber(Points.Text))
+					if lastPoints == Points then
+						totalMisses += 1
+						newLog("Infinite Stats", `{totalMisses} total misses.`, false, true)
+					else
+						newLog("Infinite Stats", `{lastPoints} -> {Points}`, false, true)
+						lastPoints = Points
+					end
+				end
+
+				local Completed = false
+				local Ready = false
+				local Switch = (Race.Value == "Namekian" and Slots.Target) or Slots.Namekian
+
+				repeat
+					Start:FireServer(Baba)
+					task.wait()
+				until Chat.Visible
+
+				local S
+				S = Service.RunService.RenderStepped:Connect(function()
+					if not Ready then
+						if Label.Text == "Change Character Slots?" then
+							Advance:FireServer({"Yes"})
+						elseif Label.Text == "Alright" then
+							Advance:FireServer({"k"})
+						elseif Label.Text == "Which slot would you like to play in?" then
+							Advance:FireServer({Switch})
+						elseif Label.Text == "Loading!" and Race.Value == "Namekian" then
+							Ready = true
+							Start:FireServer(Kami)
+						end
+					else
+						if Race.Value ~= "Namekian" then return end
+						if Label.Text == "Hello" and not Completed then
+							Advance:FireServer({"k"})
+						elseif Label.Text == "Alright let's do it" then
+							Completed = true
+						else
+							Start:FireServer(Kami)
+						end
+					end
+				end)
+
+				table.insert(Loops, S)
+			end)
+			
+			local Checker
+			Checker = Service.RunService.RenderStepped:Connect(function()
+				if self.Active and tick() - lastTick >= 30 then
+					if User.Character then User.Character:BreakJoints() end
+				end
+			end)
+			
+			if User.Character then
+				User.Character:BreakJoints()
+			end
+			
+			self.Connect(Added)
+			self.Connect(Checker)
+			self.Active = true
+			return `Stat is now enabled.`, true
+		elseif state == "off" then
+			if not self.Active then return `Stat is already disabled.`, false end
+			self.Active = false
+			self.Clean()
+			return `Stat is now disabled`, true
+		end
+	end,
+})
+
+Executor.new({ -- Unprotect
+	Name = "Unprotect",
+	Description = "Stops protecting a player.",
+	Parameters = {},
+	Requirements = {},
+	Callback = function(self, context, args)
+		if context == "hint" then return end
+		local command = Executor.get("Protect")
+		if not command then return `Something went wrong.`, false end
+		if not command.Active then return `Protect was already off bozo`, false end
+		command.Active = false
+		self.Clean()
+		return `Protect disabled.`, false
+	end,
+})
+
+Executor.new({ -- Protect
+	Name = "Protect",
+	Description = "Protect a player from mobs.",
+	Parameters = {`<player: name>`, `<range: number?>`},
+	Requirements = {},
+	Callback = function(self, context, args)
+		if not args[1] and context == "run" then return `No target found.`, false end
+		
+		local Protecting = args[1]
+		local Range = args[2] or 100
+
+		local pPlayer = Helper.findPlayer(Protecting)
+		
+		if context == "hint" then
+			if pPlayer then 
+				return {`{pPlayer}`}
+			else
+				return {}, {`invalid player`}, {[2] = true}
+			end
+		else
+			
+			if self.Active then return `Protect already enabled. Unprotect to disable.`, false end
+			
+			if not pPlayer then return `No target found.`, false end
+			
+			local pCharacter = pPlayer and pPlayer.Character
+			local pRoot = pCharacter and pCharacter:FindFirstChild("HumanoidRootPart")
+
+			local Character = User and User.Character
+			local Root = Character and Character.HumanoidRootPart
+			local Remote = Dbzfs.getRemotes().Input
+			
+			if not pRoot or not Root then return `Unable to run command`, false end
+			self.Active = true
+			
+			local Parameters = OverlapParams.new()
+			Parameters.FilterType = Enum.RaycastFilterType.Include
+			Parameters.FilterDescendantsInstances = {workspace.Live}
+
+			local function tweenTo(Target)
+				local Speed = User:DistanceFromCharacter(Target.Position) / 4000
+				game:GetService("TweenService"):Create(Root, TweenInfo.new(Speed), {
+					CFrame = Target.CFrame * CFrame.new(0, 0, 3)
+				}):Play()
+			end
+
+			local lastTick = tick()
+			local Loop
+			Loop = Service.RunService.RenderStepped:Connect(function()
+				if not self.Active then self.Clean() return end
+
+				local Enemies = {}
+				local Entities = workspace:GetPartBoundsInRadius(Root.Position, Range, Parameters)
+
+				if #Entities > 0 then
+					for _, Hit in Entities do
+
+						local tModel = Hit:FindFirstAncestorWhichIsA("Model")
+						local tRoot = tModel and tModel:FindFirstChild("HumanoidRootPart")
+						local tHumanoid = tModel and tModel:FindFirstChild("Humanoid")
+						local Damagers = tModel:FindFirstChild("Damagers")
+
+						if not tModel or not tRoot or not tHumanoid or not Damagers or (tHumanoid and tHumanoid.Health <= 0) then continue end
+						if game.Players:GetPlayerFromCharacter(tModel) then continue end
+						if pPlayer:DistanceFromCharacter(tRoot.Position) > Range then continue end 
+
+						if Damagers:FindFirstChild(Protecting) and not table.find(Enemies, tModel) then
+							table.insert(Enemies, tModel)
+						end
+
+					end
+				end
+
+				if #Enemies > 0 then
+					local Victim = Enemies[1]
+					local vRoot = Victim and Victim:FindFirstChild("HumanoidRootPart")
+					local vHum = Victim and Victim:FindFirstChild("Humanoid")
+
+					if not (Victim or vRoot or vHum) then
+						table.remove(Enemies, 1)
+						tweenTo(pRoot)
+						return
+					end
+
+					local Distance = pPlayer:DistanceFromCharacter(vRoot.Position)
+					if Distance > Range then
+						table.remove(Enemies, 1)
+						tweenTo(pRoot)
+						return
+					end
+
+					tweenTo(vRoot)
+
+					if tick() - lastTick >= 0.5 then
+						lastTick = tick()
+						Remote:FireServer({[1] = "m2"}, CFrame.new())
+					end
+				else
+					tweenTo(pRoot)
+				end
+			end)
+			
+			return `Protect has been enabled.`, true
+		end
+		
+	end,
+})
+
+Executor.new({ -- Spend
+	Name = "Spend",
+	Description = "Spend a number of skill points into a stat without clicking.",
+	Parameters = {`<stat: name>`, `<amount: number>`},
+	Requirements = {},
+	Callback = function(self, context, args)
+		
+		local statName = args[1]
+		local upgradeAmount = (args[2] and tonumber(args[2])) or nil
+		
+		local Statts = {
+			"Health-Max",
+			"Ki-Max",
+			"Phys-Damage",
+			"Ki-Damage",
+			"Phys-Resist",
+			"Ki-Resist",
+			"Speed"
+		}
+		
+		if context == "hint" then
+			local hintType
+			for _, input in Statts do
+				input = input:lower()
+				if input:sub(1, #statName) == statName:lower() then
+					hintType = input
+					if not upgradeAmount then
+						return {hintType}
+					else
+						if not upgradeAmount or typeof(upgradeAmount) ~= "number" then
+							return {hintType}, {`invalid ipnut`}
+						end
+						return {hintType}
+					end
+				end				
+			end
+			return {}, {`invalid stat`}, {[2] = true}
+		else
+			local trueName
+			
+			for _, name in Statts do
+				if name:lower() == statName then
+					trueName = name
+					break
+				end
+			end
+			
+			if not trueName then return `Invalid stat.`, false end
+			
+			local Stat = User.Character.Stats:FindFirstChild(trueName, true)
+			local AttemptUpgrade = User:FindFirstChild("AttemptUpgrade", true)
+			if not Stat or not AttemptUpgrade then return `Unable to spend skill points.`, false end
+
+			for i = 1, upgradeAmount do
+				local args = {
+					[1] = Stat
+				}
+
+				AttemptUpgrade:FireServer(unpack(args))
+			end
+		end
+	end,
+})
+
+Executor.new({ -- AntiAFK
+	Name = "AntiAFK",
+	Description = "Prevents you from getting kicked when AFK for too long.",
+	Parameters = {},
+	Requirements = {},
+	Callback = function(self, context)
+		if context == "hint" then return end
+		if self.Active then return `Anti-AFK is already on.`, false end
+		
+		User.Idled:Connect(function()
+			Service.VirtualUser:CaptureController()
+			Service.VirtualUser:ClickButton2(Vector2.new())
+			Service.VirtualUser:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+			task.wait(1)
+			Service.VirtualUser:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+		end)
+		
+		self.Active = true
+		return `Anti-AFK is now enabled.`, true
+	end
+})
+
+Executor.new({ -- Autotop
 	Name = "Autotop",
 	Description = "Does auto-top.",
 	Parameters = {`<bean: true?>`},
@@ -1077,7 +1454,7 @@ Executor.new({
 	end,
 })
 
-Executor.new({
+Executor.new({ -- Lockon
 	Name = "Lockon",
 	Description = "Bind a key for lockon.",
 	Parameters = {`<keybind: key>`},
@@ -1147,30 +1524,27 @@ Executor.new({
 	end,
 })
 
-Executor.new({
+Executor.new({ -- Kai
 	Name = "Kai",
 	Description = "Buy from elder kai.",
 	Parameters = {`<amount: number?>`},
 	Requirements = {},
 	Callback = function(self, context, args)
-		local Amount = args[1] and tonumber(args[1])
+		local Amount = (args[1] and tonumber(args[1]))
 
 		if context == "hint" then
 			if not Amount then
-				Amount = 1
+				return {}, {`invalid argument`}
 			end
-			return {Amount}
+			return
 		else
-			Amount = (typeof(Amount) == "number" and Amount > 0 and Amount) or 1
+			if not Amount or typeof(Amount) ~= "number" then return `Invalid input. Must be number.`, false end
 		end
-
-		local Position = 1
-		local Kai = workspace.FriendlyNPCs["Elder Kai"]
 
 		local Character = User.Character
 		local Root = Character and Character:FindFirstChild("HumanoidRootPart")
 		local CF = Root and Root.CFrame
-		if not Root then return `Unable to change slots.`, false end
+		if not Root then return `Unable to run command.`, false end
 
 		local ChatGui = Dbzfs.getChat()
 		local Remotes = Dbzfs.getRemotes()
@@ -1178,47 +1552,33 @@ Executor.new({
 		local Label = ChatGui.TextLabel
 		local Start = Remotes.Start
 		local Advance = Remotes.Advance
-
-		local Lines = {
-			[1] = "Hey I can unlock your potential a bit for 10,000 Zenni",
-			[2] = "Sound like a deal kid?",
-			[3] = "Alright hand it over",
-			[4] = "Good good... here we go"
-		}
-
-		local Options = {
-			[1] = {
-				[1] = "k"
-			},
-			[2] = {
-				[1] = "Yes"
-			},
-			[3] = {
-				[1] = "k"
-			},
-			[4] = {
-				[1] = "k"
-			}
-		}
+		
+		local Kai = workspace.FriendlyNPCs["Elder Kai"]
+		
+		repeat Start:FireServer(Kai) task.wait() until ChatGui.Visible
+		
+		local timeout = tick()
 		
 		task.spawn(function()
 			while true do
 				
-				task.wait(0.5)
-				
-				if Amount <= 0 then break end
-				
-				if not ChatGui.Visible then
-					Start:FireServer(Kai)
-				else
-					local Text = Label.Text
-					if Text == Lines[4] then
-						Amount -= 1
-					else
-						Advance:FireServer({Options[Position][1]})
-					end
+				if tick() - timeout >= 10 then
+					break
 				end
 				
+				if Amount <= 0 or not ChatGui.Visible then break end
+
+				if Label.Text == "Good good... here we go" and Amount > 0 then
+					timeout = tick()
+					Amount -= 1
+					Start:FireServer(Kai)
+				elseif Label.Text == "Sound like a deal kid?" then
+					Advance:FireServer({"Yes"})
+				else
+					Advance:FireServer({"k"})
+				end
+				
+				task.wait()
 			end
 		end)
 
@@ -1226,21 +1586,21 @@ Executor.new({
 	end,
 })
 
-Executor.new({
+Executor.new({ -- Waypoint
 	Name = "Waypoint",
 	Description = "Edit or teleport to waypoints.",
 	Parameters = {`<action: add | remove | list | name>`, `<name?>`},
 	Requirements = {},
 	Callback = function(self, context, args)
 		local action = args[1]
-
-		local inputType
+		
+		local hintType
 		for _, input in {"add", "remove", "list"} do
 			input = input:lower()
 			if input:sub(1, #action) == action:lower() then
-				inputType = input
-				if not args[2] and context == "hint" and input == "on" or input == "off" then
-					return {inputType}
+				hintType = input
+				if not args[2] and context == "hint" then
+					return {hintType}
 				end
 			end				
 		end
@@ -1248,17 +1608,16 @@ Executor.new({
 		local PlaceId = tostring(game.PlaceId)
 		local Character = User.Character
 		local Root = Character and Character:FindFirstChild("HumanoidRootPart")
-		if not inputType then inputType = "teleport" end
 		
-		if inputType == "add" then
+		if action == "add" then
 			local name = args[2]
 			local exists, coords = Dbzfs.findWaypoint(name, Settings)
 			if not name then return end
 			if context == "hint" then
 				if exists and exists == name then
-					return {inputType}, {`waypoint already exists`}, {[2] = true}
+					return {action}, {`waypoint already exists`}, {[2] = true}
 				end
-				return {inputType, name}
+				return {action, name}
 			end
 			
 			if exists then return `Waypoint already exists.`, false end
@@ -1274,15 +1633,15 @@ Executor.new({
 			else
 				return `Unable to create waypoint.`, true
 			end
-		elseif inputType == "remove" then
+		elseif action == "remove" then
 			local name = args[2]
 			local waypoint, coords, index = Dbzfs.findWaypoint(name)
 			if not name then return end
 			if context == "hint" then
 				if waypoint then
-					return {inputType, waypoint}
+					return {action, waypoint}
 				end
-				return {inputType}, {`no waypoint found`}
+				return {action}, {`no waypoint found`}
 			else
 				if waypoint and name == waypoint then
 					table.remove(Settings.Waypoints[PlaceId], index)
@@ -1296,16 +1655,16 @@ Executor.new({
 					return `Waypoint does not exist.`, false
 				end
 			end
-		elseif inputType == "list" then
+		elseif action == "list" then
 			if context == "hint" then
-				return {inputType}, {}, {[2] = true}
+				return {action}, {}, {[2] = true}
 			end
 			local list = Settings.Waypoints[PlaceId]
 			for _, v in list do
 				print("Waypoint:", v.Name)
 			end
 			return `View console with "/console" or F9.`, true
-		elseif inputType == "teleport" then
+		else
 			local name = action
 			local waypoint, coords = Dbzfs.findWaypoint(name)
 			if not waypoint then
@@ -1325,7 +1684,7 @@ Executor.new({
 	end,
 })
 
-Executor.new({
+Executor.new({ -- Follow
 	Name = "Follow",
 	Description = "Follow a player. Optional beans.",
 	Parameters = {`<action: on | off>`, `<player: name>`, `<bean: true?>`},
@@ -1412,7 +1771,7 @@ Executor.new({
 	end,
 })
 
-Executor.new({
+Executor.new({ -- World
 	Name = "World",
 	Description = "Teleport to another world.",
 	Parameters = {`<world: name>`},
@@ -1447,7 +1806,7 @@ Executor.new({
 	end,
 })
 
-Executor.new({
+Executor.new({ -- Teleport
 	Name = "Teleport",
 	Description = "Teleports to an enitity.",
 	Parameters = {"<player: name | mob: @name or @full_name>", "<index: number?>"},
@@ -1503,7 +1862,7 @@ Executor.new({
 	end
 })
 
-Executor.new({
+Executor.new({ -- Slot
 	Name = "Slot",
 	Description = "Prompt slot changer.",
 	Parameters = {`<slot: 1-3>`},
@@ -1596,7 +1955,7 @@ Executor.new({
 	end,
 })
 
-Executor.new({
+Executor.new({ -- Autofarm
 	Name = "Autofarm",
 	Description = "Autofarm mobs.",
 	Parameters = {`<state: on | off>`, `<mob: name or full_name> continue ...`},
@@ -1724,11 +2083,10 @@ Executor.new({
 				return `Invalid action: "{toggle}". Inputs are: On | Off.`, false
 			end
 		end
-
 	end
 })
 
-Executor.new({
+Executor.new({ -- NoSlow
 	Name = "NoSlow",
 	Description = "Disables movement hinderance.",
 	Parameters = {},
@@ -1773,7 +2131,7 @@ Executor.new({
 	end
 })
 
-Executor.new({
+Executor.new({ -- Rejoin
 	Name = "Rejoin",
 	Description = "Rejoin the current server.",
 	Parameters = {`<delay: number?>`},
@@ -1792,7 +2150,7 @@ Executor.new({
 	end,
 })
 
-Executor.new({
+Executor.new({ -- Reset
 	Name = "Reset",
 	Description = "Resets your character.",
 	Parameters = {`<savepos: true?>`},
@@ -1828,7 +2186,7 @@ Executor.new({
 	end,
 })
 
-Executor.new({
+Executor.new({ -- Help
 	Name = "Help",
 	Description = "Shows a list of commands.",
 	Parameters = {},
@@ -1848,7 +2206,7 @@ if Service.RunService:IsStudio() then return end
 loadSave()
 
 game.StarterGui:SetCore("SendNotification", {
-	Title = "Test 8";
-	Text = "5/1/2025 09:13";
+	Title = "Test 9";
+	Text = "5/3/2025 09:46 HST";
 	Duration = 5;
 })
