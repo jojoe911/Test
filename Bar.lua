@@ -360,7 +360,7 @@ end
 
 local function updateGuess(str)
 	str = str or ""
-	if str == "" then
+	if str == "" or not Input:IsFocused() then
 		Shadow.Text = ""
 		Helper.tween(Guide, 0.2, {GroupTransparency = 1, Position = UDim2.new(0.5, 0, 0.875, 0)})
 	else
@@ -1245,7 +1245,7 @@ Executor.new({ -- Unprotect
 		if not command.Active then return `Protect was already off bozo`, false end
 		command.Active = false
 		self.Clean()
-		return `Protect disabled.`, false
+		return `Protect disabled.`, true
 	end,
 })
 
