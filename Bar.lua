@@ -1,5 +1,5 @@
-local BAR_VERSION = "1.0"
-local BAR_TIME = "5/3/2025 13:03 HST"
+local BAR_VERSION = "1.0.1"
+local BAR_TIME = "5/3/2025 14:20 HST"
 
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
@@ -1038,6 +1038,27 @@ function Executor.cleanUp()
 		Command.Clean()
 	end
 end
+
+Executor.new({
+	Name = "Marker",
+	Description = "Teleports to the quest marker.",
+	Parameters = {},
+	Requirements = {},
+	Callback = function(self, context, args)
+		if context == "hint" then return end
+		local QuestGui = User.PlayerGui:FindFirstChild("Quests", true)
+		local QuestMarker = User.PlayerGui:FindFirstChild("QuestMarker", true)
+		local Root = User.Character and User.Character:FindFirstChild("HumanoidRootPart")
+		
+		if not QuestMarker or not Root then return `Unable to teleport to marker.`, false end
+		
+		local Target = (QuestMarker.Enabled and QuestMarker.Adornee)
+		if not Target then return `Unable to teleport to marker.`, false end
+		local Speed = User:DistanceFromCharacter(Target.Position) / 4000
+		Helper.tween(Root, Speed, {CFrame = Target.CFrame})
+		return `Teleporting to marker.`, true
+	end,
+})
 
 Executor.new({ -- Clip
 	Name = "Clip",
