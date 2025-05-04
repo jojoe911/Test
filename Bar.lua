@@ -1,5 +1,5 @@
-local BAR_VERSION = "1.0.1"
-local BAR_TIME = "5/3/2025 14:20 HST"
+local BAR_VERSION = "1.0.2"
+local BAR_TIME = "5/3/2025 14:43 HST"
 
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
@@ -1039,7 +1039,7 @@ function Executor.cleanUp()
 	end
 end
 
-Executor.new({
+Executor.new({ -- Marker
 	Name = "Marker",
 	Description = "Teleports to the quest marker.",
 	Parameters = {},
@@ -1601,7 +1601,7 @@ Executor.new({ -- Kai
 	Parameters = {`<amount: number?>`},
 	Requirements = {},
 	Callback = function(self, context, args)
-		local Amount = (args[1] and tonumber(args[1]))
+		local Amount = (args[1] and tonumber(args[1])) or 1
 
 		if context == "hint" then
 			if not Amount then
@@ -1626,30 +1626,29 @@ Executor.new({ -- Kai
 		
 		local Kai = workspace.FriendlyNPCs["Elder Kai"]
 		
-		repeat Start:FireServer(Kai) task.wait() until ChatGui.Visible
-		
-		local timeout = tick()
+		local Restart = true
 		
 		task.spawn(function()
-			while true do
+			
+			while Amount > 0 do
 				
-				if tick() - timeout >= 10 then
-					break
+				task.wait()
+				
+				if Restart then
+					Start:FireServer(Kai)
 				end
 				
-				if Amount <= 0 or not ChatGui.Visible then break end
-
-				if Label.Text == "Good good... here we go" and Amount > 0 then
-					timeout = tick()
-					Amount -= 1
-					Start:FireServer(Kai)
+				if Label.Text == "Hey I can unlock your potential a bit for 10,000 Zenni" then
+					Restart = false
+					Advance:FireServer({"k"})
 				elseif Label.Text == "Sound like a deal kid?" then
 					Advance:FireServer({"Yes"})
+				elseif Label.Text == "Good good... here we go" and not Restart then
+					Restart = true
+					Amount -= 1
 				else
 					Advance:FireServer({"k"})
 				end
-				
-				task.wait()
 			end
 		end)
 
