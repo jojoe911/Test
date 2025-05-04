@@ -1,5 +1,5 @@
-local BAR_VERSION = "1.0.2"
-local BAR_TIME = "5/3/2025 14:43 HST"
+local BAR_VERSION = "1.0.4"
+local BAR_TIME = "5/3/2025 16:20 HST"
 
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
@@ -1038,6 +1038,54 @@ function Executor.cleanUp()
 		Command.Clean()
 	end
 end
+
+Executor.new({ -- Autobean
+	Name = "Autobean",
+	Description = "Auto senzu beans",
+	Parameters = {`<state: on | off>`},
+	Requirements = {},
+	Callback = function(self, context, args)
+		local action = args[1]
+		
+		if context == "hint" then
+			for _, input in {"on", "off"} do
+				input = input:lower()
+				if input:sub(1, #action) == action:lower() then
+					return input
+				end
+			end
+			
+			return {}, {`invalid input`}
+		else
+			if action == "on" then
+				if self.Active then return `Autobean already enabled.`, false end
+				self.Active = true
+				
+				local Remotes = Dbzfs.getRemotes()
+				local lastBean = tick()
+				
+				local Loop
+				Loop = Service.RunService.Heartbeat:Connect(function()
+					if not self.Active then return end
+					if tick() - lastBean >= 5 then
+						lastBean = tick()
+						Remotes.EatSenzu:FireServer(' ');
+					end
+				end)
+				
+				self.Connect(Loop)
+				return `Autobean enabled.`, true
+			elseif action == "off" then
+				if not self.Active then return `Autobean already disabled.`, false end
+				self.Active = false
+				self.Clean()
+				return `Autobean disabled.`, true
+			else
+				return `Invalid input.`, false
+			end
+		end
+	end,
+})
 
 Executor.new({ -- Marker
 	Name = "Marker",
@@ -2257,6 +2305,18 @@ Executor.new({ -- Reset
 	end,
 })
 
+Executor.new({
+	Name = "Version",
+	Description = "Shows version.",
+	Parameters = {},
+	Requirements = {},
+	Callback = function(self, context)
+		if context == "hint" then return end
+		print(`Version: {BAR_VERSION} | Update: {BAR_TIME}.`)
+		return `View console by "/console" or F9.`, true
+	end,
+})
+
 Executor.new({ -- Help
 	Name = "Help",
 	Description = "Shows a list of commands.",
@@ -2277,7 +2337,7 @@ if Service.RunService:IsStudio() then return end
 loadSave()
 
 game.StarterGui:SetCore("SendNotification", {
-	Title = BAR_VERSION;
+	Title = `v{BAR_VERSION}`;
 	Text = BAR_TIME;
 	Duration = 5;
 })
