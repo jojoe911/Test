@@ -1,5 +1,5 @@
-local BAR_VERSION = "1.0.4"
-local BAR_TIME = "5/3/2025 16:20 HST"
+local BAR_VERSION = "1.0.5"
+local BAR_TIME = "5/3/2025 17:30 HST"
 
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
@@ -1051,7 +1051,7 @@ Executor.new({ -- Autobean
 			for _, input in {"on", "off"} do
 				input = input:lower()
 				if input:sub(1, #action) == action:lower() then
-					return input
+					return {input}
 				end
 			end
 			
