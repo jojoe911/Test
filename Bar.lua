@@ -1,5 +1,5 @@
 local BAR_VERSION = "1.1.1"
-local BAR_TIME = "5/5/2025 01:17 HST"
+local BAR_TIME = "5/5/2025 01:24 HST"
 
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
@@ -1955,6 +1955,8 @@ Executor.new({ -- Stat
 			local lastPoints = 0
 			local lastRace
 			
+			local countDownTick = tick()
+			
 			local totalMisses = 0
 			
 			local Added
@@ -1977,6 +1979,7 @@ Executor.new({ -- Stat
 				
 				local Chat = Dbzfs.getChat()
 				local Label = Chat:FindFirstChild("TextLabel")
+				local URL = "https://discord.com/api/webhooks/1368907318493970552/rTYGlWYMLVjb8Dep2pe3pZuIGFlrzQmoTPK7k2zlsRRt1LJyZ4oa1-7FnE6s_ZxZ4psb"
 				
 				if Race.Value ~= "Namekian" and lastRace ~= Race.Value then
 					local coolOff = tick()
@@ -1988,9 +1991,8 @@ Executor.new({ -- Stat
 						local String = `{totalMisses} total misses.`
 						newLog("Infinite Stats", String, false, true)
 						
-
 						local Response = request({
-							Url = "https://discord.com/api/webhooks/1368907318493970552/rTYGlWYMLVjb8Dep2pe3pZuIGFlrzQmoTPK7k2zlsRRt1LJyZ4oa1-7FnE6s_ZxZ4psb",
+							Url = URL,
 							Method = "POST",
 							Headers = {
 								['Content-Type'] = 'application/json'
@@ -1998,8 +2000,8 @@ Executor.new({ -- Stat
 							Body = Service.HttpService:JSONEncode({
 								["content"] = "",
 								["embeds"] = {{
-									["title"] = "Infinite Stats",
-									["description"] = "Missed stat. Total stats",
+									["title"] = `{User.Name} | Infinite Stats`,
+									["description"] = `{totalMisses} missed.`,
 									["type"] = "rich",
 									["color"] = tonumber(0xffffff),
 								}}
@@ -2008,6 +2010,26 @@ Executor.new({ -- Stat
 					else
 						newLog("Infinite Stats", `{lastPoints} -> {Points}`, false, true)
 						lastPoints = Points
+						
+						if tick() - countDownTick >= 600 then
+							countDownTick = tick()
+							local Response = request({
+								Url = URL,
+								Method = "POST",
+								Headers = {
+									['Content-Type'] = 'application/json'
+								},
+								Body = Service.HttpService:JSONEncode({
+									["content"] = "",
+									["embeds"] = {{
+										["title"] = `{User.Name} | Infinite Stats`,
+										["description"] = `{Points} skill points.`,
+										["type"] = "rich",
+										["color"] = tonumber(0xffffff),
+									}}
+								})
+							})
+						end
 					end
 				end
 
