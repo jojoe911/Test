@@ -1039,6 +1039,18 @@ function Executor.cleanUp()
 	end
 end
 
+Executor.new({
+	Name = "Reload",
+	Description = "Reloads the command bar.",
+	Parameters = {},
+	Requirements = {},
+	Callback = function(self, context, args)
+		if context == "hint" then return end
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/jojoe911/Test/refs/heads/main/Bar.lua"))()
+		return `Reloading.`, true
+	end,
+})
+
 Executor.new({ -- Nearby
 	Name = "Autoquest",
 	Description = "Automatically accepts nearby quests.",
