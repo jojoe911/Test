@@ -1,5 +1,5 @@
-local BAR_VERSION = "1.1.1"
-local BAR_TIME = "5/5/2025 01:24 HST"
+local BAR_VERSION = "1.1.2"
+local BAR_TIME = "5/5/2025 07:16 HST"
 
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
@@ -1954,10 +1954,8 @@ Executor.new({ -- Stat
 			local lastTick = tick()
 			local lastPoints = 0
 			local lastRace
-			
-			local countDownTick = tick()
-			
 			local totalMisses = 0
+			local countDownTick = tick()
 			
 			local Added
 			Added = User.CharacterAdded:Connect(function(Character)
@@ -1988,25 +1986,27 @@ Executor.new({ -- Stat
 					Points = (Points and tonumber(Points.Text))
 					if lastPoints == Points then
 						totalMisses += 1
-						local String = `{totalMisses} total misses.`
-						newLog("Infinite Stats", String, false, true)
-						
-						local Response = request({
-							Url = URL,
-							Method = "POST",
-							Headers = {
-								['Content-Type'] = 'application/json'
-							},
-							Body = Service.HttpService:JSONEncode({
-								["content"] = "",
-								["embeds"] = {{
-									["title"] = `{User.Name} | Infinite Stats`,
-									["description"] = `{totalMisses} missed.`,
-									["type"] = "rich",
-									["color"] = tonumber(0xffffff),
-								}}
+						if totalMisses % 3 == 0 then
+							local String = `{totalMisses} total misses.`
+							newLog("Infinite Stats", String, false, true)
+							
+							local Response = request({
+								Url = URL,
+								Method = "POST",
+								Headers = {
+									['Content-Type'] = 'application/json'
+								},
+								Body = Service.HttpService:JSONEncode({
+									["content"] = "",
+									["embeds"] = {{
+										["title"] = `{User.Name} | Infinite Stats`,
+										["description"] = `{totalMisses} missed.`,
+										["type"] = "rich",
+										["color"] = tonumber(0xffffff),
+									}}
+								})
 							})
-						})
+						end
 					else
 						newLog("Infinite Stats", `{lastPoints} -> {Points}`, false, true)
 						lastPoints = Points
