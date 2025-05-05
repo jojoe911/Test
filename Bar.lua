@@ -1,5 +1,5 @@
-local BAR_VERSION = "1.1.0"
-local BAR_TIME = "5/4/2025 21:07 HST"
+local BAR_VERSION = "1.1.1"
+local BAR_TIME = "5/5/2025 01:17 HST"
 
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
