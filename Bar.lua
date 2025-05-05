@@ -1,5 +1,5 @@
-local BAR_VERSION = "1.0.6"
-local BAR_TIME = "5/4/2025 15:30 HST"
+local BAR_VERSION = "1.1.0"
+local BAR_TIME = "5/4/2025 21:07 HST"
 
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
@@ -48,6 +48,59 @@ local Converted = {
 	["_UITextSizeConstraint1"] = Instance.new("UITextSizeConstraint");
 }
 
+local Converted_2 = {
+	["_Custom"] = Instance.new("Frame");
+	["_Title"] = Instance.new("TextLabel");
+	["_UICorner"] = Instance.new("UICorner");
+	["_List"] = Instance.new("Frame");
+	["_UIListLayout"] = Instance.new("UIListLayout");
+	["_Stat"] = Instance.new("Frame");
+	["_UICorner1"] = Instance.new("UICorner");
+	["_Title1"] = Instance.new("TextLabel");
+	["_Confirm"] = Instance.new("TextButton");
+	["_UIAspectRatioConstraint"] = Instance.new("UIAspectRatioConstraint");
+	["_Val"] = Instance.new("TextLabel");
+	["_Stat1"] = Instance.new("Frame");
+	["_UICorner2"] = Instance.new("UICorner");
+	["_Title2"] = Instance.new("TextLabel");
+	["_Confirm1"] = Instance.new("TextButton");
+	["_UIAspectRatioConstraint1"] = Instance.new("UIAspectRatioConstraint");
+	["_Val1"] = Instance.new("TextLabel");
+	["_Stat2"] = Instance.new("Frame");
+	["_UICorner3"] = Instance.new("UICorner");
+	["_Title3"] = Instance.new("TextLabel");
+	["_Confirm2"] = Instance.new("TextButton");
+	["_UIAspectRatioConstraint2"] = Instance.new("UIAspectRatioConstraint");
+	["_Val2"] = Instance.new("TextLabel");
+	["_Stat3"] = Instance.new("Frame");
+	["_UICorner4"] = Instance.new("UICorner");
+	["_Title4"] = Instance.new("TextLabel");
+	["_Confirm3"] = Instance.new("TextButton");
+	["_UIAspectRatioConstraint3"] = Instance.new("UIAspectRatioConstraint");
+	["_Val3"] = Instance.new("TextLabel");
+	["_Stat4"] = Instance.new("Frame");
+	["_UICorner5"] = Instance.new("UICorner");
+	["_Title5"] = Instance.new("TextLabel");
+	["_Confirm4"] = Instance.new("TextButton");
+	["_UIAspectRatioConstraint4"] = Instance.new("UIAspectRatioConstraint");
+	["_Val4"] = Instance.new("TextLabel");
+	["_Stat5"] = Instance.new("Frame");
+	["_UICorner6"] = Instance.new("UICorner");
+	["_Title6"] = Instance.new("TextLabel");
+	["_Confirm5"] = Instance.new("TextButton");
+	["_UIAspectRatioConstraint5"] = Instance.new("UIAspectRatioConstraint");
+	["_Val5"] = Instance.new("TextLabel");
+	["_Stat6"] = Instance.new("Frame");
+	["_UICorner7"] = Instance.new("UICorner");
+	["_Title7"] = Instance.new("TextLabel");
+	["_Confirm6"] = Instance.new("TextButton");
+	["_UIAspectRatioConstraint6"] = Instance.new("UIAspectRatioConstraint");
+	["_Val6"] = Instance.new("TextLabel");
+	["_Title8"] = Instance.new("TextLabel");
+	["_Amount"] = Instance.new("TextBox");
+	["_UICorner8"] = Instance.new("UICorner");
+}
+
 do
 	
 	local Path = Service.Players.LocalPlayer.PlayerGui
@@ -58,7 +111,13 @@ do
 			Old:Destroy()
 		end
 	end
-
+	
+	
+	
+	-- [[ Main Command Bar ]]
+	
+	
+	
 	Converted["_Admin"].IgnoreGuiInset = true
 	Converted["_Admin"].ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
 	Converted["_Admin"].ResetOnSpawn = false
@@ -316,6 +375,517 @@ do
 
 	Converted["_UITextSizeConstraint1"].MaxTextSize = 18
 	Converted["_UITextSizeConstraint1"].Parent = Converted["_Shadow"]
+	
+	
+	
+	-- [[ Custom Spender ]]
+	
+	
+	
+	Converted_2["_Custom"].AnchorPoint = Vector2.new(0.5, 0.5)
+	Converted_2["_Custom"].BackgroundColor3 = Color3.fromRGB(25.000000409781933, 25.000000409781933, 25.000000409781933)
+	Converted_2["_Custom"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Custom"].BorderSizePixel = 0
+	Converted_2["_Custom"].Position = UDim2.new(0.5, 0, 0.5, 0)
+	Converted_2["_Custom"].Size = UDim2.new(0.25, 0, 0.45, 0)
+	Converted_2["_Custom"].Name = "Custom"
+	Converted_2["_Custom"].Visible = false
+	Converted_2["_Custom"].Parent = Converted["_Admin"]
+
+	Converted_2["_Title"].Font = Enum.Font.Unknown
+	Converted_2["_Title"].Text = "Custom Skill Point Spender"
+	Converted_2["_Title"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title"].TextScaled = true
+	Converted_2["_Title"].TextSize = 14
+	Converted_2["_Title"].TextWrapped = true
+	Converted_2["_Title"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title"].BackgroundTransparency = 1
+	Converted_2["_Title"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Title"].BorderSizePixel = 0
+	Converted_2["_Title"].Position = UDim2.new(0.0487049781, 0, 0.0512212887, 0)
+	Converted_2["_Title"].Size = UDim2.new(0.896177053, 0, 0.0791179761, 0)
+	Converted_2["_Title"].Name = "Title"
+	Converted_2["_Title"].Parent = Converted_2["_Custom"]
+
+	Converted_2["_UICorner"].CornerRadius = UDim.new(0, 10)
+	Converted_2["_UICorner"].Parent = Converted_2["_Custom"]
+
+	Converted_2["_List"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_List"].BackgroundTransparency = 1
+	Converted_2["_List"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_List"].BorderSizePixel = 0
+	Converted_2["_List"].Position = UDim2.new(0.0487054884, 0, 0.15897432, 0)
+	Converted_2["_List"].Size = UDim2.new(0.898612261, 0, 0.697544038, 0)
+	Converted_2["_List"].Name = "List"
+	Converted_2["_List"].Parent = Converted_2["_Custom"]
+
+	Converted_2["_UIListLayout"].Padding = UDim.new(0.00999999978, 0)
+	Converted_2["_UIListLayout"].VerticalFlex = Enum.UIFlexAlignment.Fill
+	Converted_2["_UIListLayout"].HorizontalAlignment = Enum.HorizontalAlignment.Center
+	Converted_2["_UIListLayout"].SortOrder = Enum.SortOrder.LayoutOrder
+	Converted_2["_UIListLayout"].Parent = Converted_2["_List"]
+
+	Converted_2["_Stat"].BackgroundColor3 = Color3.fromRGB(35.00000171363354, 35.00000171363354, 35.00000171363354)
+	Converted_2["_Stat"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Stat"].BorderSizePixel = 0
+	Converted_2["_Stat"].LayoutOrder = 1
+	Converted_2["_Stat"].Size = UDim2.new(1, 0, 0.150000006, 0)
+	Converted_2["_Stat"].Name = "Stat"
+	Converted_2["_Stat"].Parent = Converted_2["_List"]
+
+	Converted_2["_UICorner1"].CornerRadius = UDim.new(0, 5)
+	Converted_2["_UICorner1"].Parent = Converted_2["_Stat"]
+
+	Converted_2["_Title1"].Font = Enum.Font.Unknown
+	Converted_2["_Title1"].Text = "Health Max"
+	Converted_2["_Title1"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title1"].TextScaled = true
+	Converted_2["_Title1"].TextSize = 14
+	Converted_2["_Title1"].TextWrapped = true
+	Converted_2["_Title1"].TextXAlignment = Enum.TextXAlignment.Left
+	Converted_2["_Title1"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title1"].BackgroundTransparency = 1
+	Converted_2["_Title1"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Title1"].BorderSizePixel = 0
+	Converted_2["_Title1"].Position = UDim2.new(0.0540501289, 0, 0.266274422, 0)
+	Converted_2["_Title1"].Size = UDim2.new(0.455434769, 0, 0.442020774, 0)
+	Converted_2["_Title1"].Name = "Title"
+	Converted_2["_Title1"].Parent = Converted_2["_Stat"]
+
+	Converted_2["_Confirm"].Font = Enum.Font.SourceSansBold
+	Converted_2["_Confirm"].Text = "+"
+	Converted_2["_Confirm"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Confirm"].TextScaled = true
+	Converted_2["_Confirm"].TextSize = 14
+	Converted_2["_Confirm"].TextWrapped = true
+	Converted_2["_Confirm"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Confirm"].BackgroundTransparency = 1
+	Converted_2["_Confirm"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Confirm"].BorderSizePixel = 0
+	Converted_2["_Confirm"].Position = UDim2.new(0.876916826, 0, -0.0222594738, 0)
+	Converted_2["_Confirm"].Size = UDim2.new(0.200542003, 0, 0.994623542, 0)
+	Converted_2["_Confirm"].Name = "Confirm"
+	Converted_2["_Confirm"].Parent = Converted_2["_Stat"]
+
+	Converted_2["_UIAspectRatioConstraint"].Parent = Converted_2["_Confirm"]
+
+	Converted_2["_Val"].Font = Enum.Font.Unknown
+	Converted_2["_Val"].Text = "1"
+	Converted_2["_Val"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Val"].TextScaled = true
+	Converted_2["_Val"].TextSize = 14
+	Converted_2["_Val"].TextWrapped = true
+	Converted_2["_Val"].TextXAlignment = Enum.TextXAlignment.Right
+	Converted_2["_Val"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Val"].BackgroundTransparency = 1
+	Converted_2["_Val"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Val"].BorderSizePixel = 0
+	Converted_2["_Val"].Position = UDim2.new(0.509485066, 0, 0.266274422, 0)
+	Converted_2["_Val"].Size = UDim2.new(0.344194859, 0, 0.442020774, 0)
+	Converted_2["_Val"].Visible = false
+	Converted_2["_Val"].Name = "Val"
+	Converted_2["_Val"].Parent = Converted_2["_Stat"]
+
+	Converted_2["_Stat1"].BackgroundColor3 = Color3.fromRGB(35.00000171363354, 35.00000171363354, 35.00000171363354)
+	Converted_2["_Stat1"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Stat1"].BorderSizePixel = 0
+	Converted_2["_Stat1"].LayoutOrder = 4
+	Converted_2["_Stat1"].Size = UDim2.new(1, 0, 0.150000006, 0)
+	Converted_2["_Stat1"].Name = "Stat"
+	Converted_2["_Stat1"].Parent = Converted_2["_List"]
+
+	Converted_2["_UICorner2"].CornerRadius = UDim.new(0, 5)
+	Converted_2["_UICorner2"].Parent = Converted_2["_Stat1"]
+
+	Converted_2["_Title2"].Font = Enum.Font.Unknown
+	Converted_2["_Title2"].Text = "Ki Damage"
+	Converted_2["_Title2"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title2"].TextScaled = true
+	Converted_2["_Title2"].TextSize = 14
+	Converted_2["_Title2"].TextWrapped = true
+	Converted_2["_Title2"].TextXAlignment = Enum.TextXAlignment.Left
+	Converted_2["_Title2"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title2"].BackgroundTransparency = 1
+	Converted_2["_Title2"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Title2"].BorderSizePixel = 0
+	Converted_2["_Title2"].Position = UDim2.new(0.0540501289, 0, 0.266274065, 0)
+	Converted_2["_Title2"].Size = UDim2.new(0.455434769, 0, 0.442020535, 0)
+	Converted_2["_Title2"].Name = "Title"
+	Converted_2["_Title2"].Parent = Converted_2["_Stat1"]
+
+	Converted_2["_Confirm1"].Font = Enum.Font.SourceSansBold
+	Converted_2["_Confirm1"].Text = "+"
+	Converted_2["_Confirm1"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Confirm1"].TextScaled = true
+	Converted_2["_Confirm1"].TextSize = 14
+	Converted_2["_Confirm1"].TextWrapped = true
+	Converted_2["_Confirm1"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Confirm1"].BackgroundTransparency = 1
+	Converted_2["_Confirm1"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Confirm1"].BorderSizePixel = 0
+	Converted_2["_Confirm1"].Position = UDim2.new(0.876916826, 0, -0.0222594738, 0)
+	Converted_2["_Confirm1"].Size = UDim2.new(0.200542003, 0, 0.994623542, 0)
+	Converted_2["_Confirm1"].Name = "Confirm"
+	Converted_2["_Confirm1"].Parent = Converted_2["_Stat1"]
+
+	Converted_2["_UIAspectRatioConstraint1"].Parent = Converted_2["_Confirm1"]
+
+	Converted_2["_Val1"].Font = Enum.Font.Unknown
+	Converted_2["_Val1"].Text = "1"
+	Converted_2["_Val1"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Val1"].TextScaled = true
+	Converted_2["_Val1"].TextSize = 14
+	Converted_2["_Val1"].TextWrapped = true
+	Converted_2["_Val1"].TextXAlignment = Enum.TextXAlignment.Right
+	Converted_2["_Val1"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Val1"].BackgroundTransparency = 1
+	Converted_2["_Val1"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Val1"].BorderSizePixel = 0
+	Converted_2["_Val1"].Position = UDim2.new(0.509485066, 0, 0.266274422, 0)
+	Converted_2["_Val1"].Size = UDim2.new(0.344194859, 0, 0.442020774, 0)
+	Converted_2["_Val1"].Visible = false
+	Converted_2["_Val1"].Name = "Val"
+	Converted_2["_Val1"].Parent = Converted_2["_Stat1"]
+
+	Converted_2["_Stat2"].BackgroundColor3 = Color3.fromRGB(35.00000171363354, 35.00000171363354, 35.00000171363354)
+	Converted_2["_Stat2"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Stat2"].BorderSizePixel = 0
+	Converted_2["_Stat2"].LayoutOrder = 2
+	Converted_2["_Stat2"].Size = UDim2.new(1, 0, 0.150000006, 0)
+	Converted_2["_Stat2"].Name = "Stat"
+	Converted_2["_Stat2"].Parent = Converted_2["_List"]
+
+	Converted_2["_UICorner3"].CornerRadius = UDim.new(0, 5)
+	Converted_2["_UICorner3"].Parent = Converted_2["_Stat2"]
+
+	Converted_2["_Title3"].Font = Enum.Font.Unknown
+	Converted_2["_Title3"].Text = "Ki Max"
+	Converted_2["_Title3"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title3"].TextScaled = true
+	Converted_2["_Title3"].TextSize = 14
+	Converted_2["_Title3"].TextWrapped = true
+	Converted_2["_Title3"].TextXAlignment = Enum.TextXAlignment.Left
+	Converted_2["_Title3"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title3"].BackgroundTransparency = 1
+	Converted_2["_Title3"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Title3"].BorderSizePixel = 0
+	Converted_2["_Title3"].Position = UDim2.new(0.0540501289, 0, 0.266274065, 0)
+	Converted_2["_Title3"].Size = UDim2.new(0.455434769, 0, 0.442020863, 0)
+	Converted_2["_Title3"].Name = "Title"
+	Converted_2["_Title3"].Parent = Converted_2["_Stat2"]
+
+	Converted_2["_Confirm2"].Font = Enum.Font.SourceSansBold
+	Converted_2["_Confirm2"].Text = "+"
+	Converted_2["_Confirm2"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Confirm2"].TextScaled = true
+	Converted_2["_Confirm2"].TextSize = 14
+	Converted_2["_Confirm2"].TextWrapped = true
+	Converted_2["_Confirm2"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Confirm2"].BackgroundTransparency = 1
+	Converted_2["_Confirm2"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Confirm2"].BorderSizePixel = 0
+	Converted_2["_Confirm2"].Position = UDim2.new(0.876916826, 0, -0.0222594738, 0)
+	Converted_2["_Confirm2"].Size = UDim2.new(0.200542003, 0, 0.994623542, 0)
+	Converted_2["_Confirm2"].Name = "Confirm"
+	Converted_2["_Confirm2"].Parent = Converted_2["_Stat2"]
+
+	Converted_2["_UIAspectRatioConstraint2"].Parent = Converted_2["_Confirm2"]
+
+	Converted_2["_Val2"].Font = Enum.Font.Unknown
+	Converted_2["_Val2"].Text = "1"
+	Converted_2["_Val2"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Val2"].TextScaled = true
+	Converted_2["_Val2"].TextSize = 14
+	Converted_2["_Val2"].TextWrapped = true
+	Converted_2["_Val2"].TextXAlignment = Enum.TextXAlignment.Right
+	Converted_2["_Val2"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Val2"].BackgroundTransparency = 1
+	Converted_2["_Val2"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Val2"].BorderSizePixel = 0
+	Converted_2["_Val2"].Position = UDim2.new(0.509485066, 0, 0.266274422, 0)
+	Converted_2["_Val2"].Size = UDim2.new(0.344194859, 0, 0.442020774, 0)
+	Converted_2["_Val2"].Visible = false
+	Converted_2["_Val2"].Name = "Val"
+	Converted_2["_Val2"].Parent = Converted_2["_Stat2"]
+
+	Converted_2["_Stat3"].BackgroundColor3 = Color3.fromRGB(35.00000171363354, 35.00000171363354, 35.00000171363354)
+	Converted_2["_Stat3"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Stat3"].BorderSizePixel = 0
+	Converted_2["_Stat3"].LayoutOrder = 3
+	Converted_2["_Stat3"].Size = UDim2.new(1, 0, 0.150000006, 0)
+	Converted_2["_Stat3"].Name = "Stat"
+	Converted_2["_Stat3"].Parent = Converted_2["_List"]
+
+	Converted_2["_UICorner4"].CornerRadius = UDim.new(0, 5)
+	Converted_2["_UICorner4"].Parent = Converted_2["_Stat3"]
+
+	Converted_2["_Title4"].Font = Enum.Font.Unknown
+	Converted_2["_Title4"].Text = "Melee Damage"
+	Converted_2["_Title4"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title4"].TextScaled = true
+	Converted_2["_Title4"].TextSize = 14
+	Converted_2["_Title4"].TextWrapped = true
+	Converted_2["_Title4"].TextXAlignment = Enum.TextXAlignment.Left
+	Converted_2["_Title4"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title4"].BackgroundTransparency = 1
+	Converted_2["_Title4"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Title4"].BorderSizePixel = 0
+	Converted_2["_Title4"].Position = UDim2.new(0.0540501289, 0, 0.266274065, 0)
+	Converted_2["_Title4"].Size = UDim2.new(0.455434769, 0, 0.442020863, 0)
+	Converted_2["_Title4"].Name = "Title"
+	Converted_2["_Title4"].Parent = Converted_2["_Stat3"]
+
+	Converted_2["_Confirm3"].Font = Enum.Font.SourceSansBold
+	Converted_2["_Confirm3"].Text = "+"
+	Converted_2["_Confirm3"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Confirm3"].TextScaled = true
+	Converted_2["_Confirm3"].TextSize = 14
+	Converted_2["_Confirm3"].TextWrapped = true
+	Converted_2["_Confirm3"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Confirm3"].BackgroundTransparency = 1
+	Converted_2["_Confirm3"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Confirm3"].BorderSizePixel = 0
+	Converted_2["_Confirm3"].Position = UDim2.new(0.876916826, 0, -0.0222594738, 0)
+	Converted_2["_Confirm3"].Size = UDim2.new(0.200542003, 0, 0.994623542, 0)
+	Converted_2["_Confirm3"].Name = "Confirm"
+	Converted_2["_Confirm3"].Parent = Converted_2["_Stat3"]
+
+	Converted_2["_UIAspectRatioConstraint3"].Parent = Converted_2["_Confirm3"]
+
+	Converted_2["_Val3"].Font = Enum.Font.Unknown
+	Converted_2["_Val3"].Text = "1"
+	Converted_2["_Val3"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Val3"].TextScaled = true
+	Converted_2["_Val3"].TextSize = 14
+	Converted_2["_Val3"].TextWrapped = true
+	Converted_2["_Val3"].TextXAlignment = Enum.TextXAlignment.Right
+	Converted_2["_Val3"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Val3"].BackgroundTransparency = 1
+	Converted_2["_Val3"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Val3"].BorderSizePixel = 0
+	Converted_2["_Val3"].Position = UDim2.new(0.509485066, 0, 0.266274422, 0)
+	Converted_2["_Val3"].Size = UDim2.new(0.344194859, 0, 0.442020774, 0)
+	Converted_2["_Val3"].Visible = false
+	Converted_2["_Val3"].Name = "Val"
+	Converted_2["_Val3"].Parent = Converted_2["_Stat3"]
+
+	Converted_2["_Stat4"].BackgroundColor3 = Color3.fromRGB(35.00000171363354, 35.00000171363354, 35.00000171363354)
+	Converted_2["_Stat4"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Stat4"].BorderSizePixel = 0
+	Converted_2["_Stat4"].LayoutOrder = 5
+	Converted_2["_Stat4"].Size = UDim2.new(1, 0, 0.150000006, 0)
+	Converted_2["_Stat4"].Name = "Stat"
+	Converted_2["_Stat4"].Parent = Converted_2["_List"]
+
+	Converted_2["_UICorner5"].CornerRadius = UDim.new(0, 5)
+	Converted_2["_UICorner5"].Parent = Converted_2["_Stat4"]
+
+	Converted_2["_Title5"].Font = Enum.Font.Unknown
+	Converted_2["_Title5"].Text = "Melee Resistance"
+	Converted_2["_Title5"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title5"].TextScaled = true
+	Converted_2["_Title5"].TextSize = 14
+	Converted_2["_Title5"].TextWrapped = true
+	Converted_2["_Title5"].TextXAlignment = Enum.TextXAlignment.Left
+	Converted_2["_Title5"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title5"].BackgroundTransparency = 1
+	Converted_2["_Title5"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Title5"].BorderSizePixel = 0
+	Converted_2["_Title5"].Position = UDim2.new(0.0540501289, 0, 0.266274065, 0)
+	Converted_2["_Title5"].Size = UDim2.new(0.455434769, 0, 0.442020535, 0)
+	Converted_2["_Title5"].Name = "Title"
+	Converted_2["_Title5"].Parent = Converted_2["_Stat4"]
+
+	Converted_2["_Confirm4"].Font = Enum.Font.SourceSansBold
+	Converted_2["_Confirm4"].Text = "+"
+	Converted_2["_Confirm4"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Confirm4"].TextScaled = true
+	Converted_2["_Confirm4"].TextSize = 14
+	Converted_2["_Confirm4"].TextWrapped = true
+	Converted_2["_Confirm4"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Confirm4"].BackgroundTransparency = 1
+	Converted_2["_Confirm4"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Confirm4"].BorderSizePixel = 0
+	Converted_2["_Confirm4"].Position = UDim2.new(0.876916826, 0, -0.0222594738, 0)
+	Converted_2["_Confirm4"].Size = UDim2.new(0.200542003, 0, 0.994623542, 0)
+	Converted_2["_Confirm4"].Name = "Confirm"
+	Converted_2["_Confirm4"].Parent = Converted_2["_Stat4"]
+
+	Converted_2["_UIAspectRatioConstraint4"].Parent = Converted_2["_Confirm4"]
+
+	Converted_2["_Val4"].Font = Enum.Font.Unknown
+	Converted_2["_Val4"].Text = "1"
+	Converted_2["_Val4"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Val4"].TextScaled = true
+	Converted_2["_Val4"].TextSize = 14
+	Converted_2["_Val4"].TextWrapped = true
+	Converted_2["_Val4"].TextXAlignment = Enum.TextXAlignment.Right
+	Converted_2["_Val4"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Val4"].BackgroundTransparency = 1
+	Converted_2["_Val4"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Val4"].BorderSizePixel = 0
+	Converted_2["_Val4"].Position = UDim2.new(0.509485066, 0, 0.266274422, 0)
+	Converted_2["_Val4"].Size = UDim2.new(0.344194859, 0, 0.442020774, 0)
+	Converted_2["_Val4"].Visible = false
+	Converted_2["_Val4"].Name = "Val"
+	Converted_2["_Val4"].Parent = Converted_2["_Stat4"]
+
+	Converted_2["_Stat5"].BackgroundColor3 = Color3.fromRGB(35.00000171363354, 35.00000171363354, 35.00000171363354)
+	Converted_2["_Stat5"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Stat5"].BorderSizePixel = 0
+	Converted_2["_Stat5"].LayoutOrder = 6
+	Converted_2["_Stat5"].Size = UDim2.new(1, 0, 0.150000006, 0)
+	Converted_2["_Stat5"].Name = "Stat"
+	Converted_2["_Stat5"].Parent = Converted_2["_List"]
+
+	Converted_2["_UICorner6"].CornerRadius = UDim.new(0, 5)
+	Converted_2["_UICorner6"].Parent = Converted_2["_Stat5"]
+
+	Converted_2["_Title6"].Font = Enum.Font.Unknown
+	Converted_2["_Title6"].Text = "Ki Resistance"
+	Converted_2["_Title6"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title6"].TextScaled = true
+	Converted_2["_Title6"].TextSize = 14
+	Converted_2["_Title6"].TextWrapped = true
+	Converted_2["_Title6"].TextXAlignment = Enum.TextXAlignment.Left
+	Converted_2["_Title6"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title6"].BackgroundTransparency = 1
+	Converted_2["_Title6"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Title6"].BorderSizePixel = 0
+	Converted_2["_Title6"].Position = UDim2.new(0.0540501289, 0, 0.266274065, 0)
+	Converted_2["_Title6"].Size = UDim2.new(0.455434769, 0, 0.442021221, 0)
+	Converted_2["_Title6"].Name = "Title"
+	Converted_2["_Title6"].Parent = Converted_2["_Stat5"]
+
+	Converted_2["_Confirm5"].Font = Enum.Font.SourceSansBold
+	Converted_2["_Confirm5"].Text = "+"
+	Converted_2["_Confirm5"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Confirm5"].TextScaled = true
+	Converted_2["_Confirm5"].TextSize = 14
+	Converted_2["_Confirm5"].TextWrapped = true
+	Converted_2["_Confirm5"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Confirm5"].BackgroundTransparency = 1
+	Converted_2["_Confirm5"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Confirm5"].BorderSizePixel = 0
+	Converted_2["_Confirm5"].Position = UDim2.new(0.876916826, 0, -0.0222594738, 0)
+	Converted_2["_Confirm5"].Size = UDim2.new(0.200542003, 0, 0.994623542, 0)
+	Converted_2["_Confirm5"].Name = "Confirm"
+	Converted_2["_Confirm5"].Parent = Converted_2["_Stat5"]
+
+	Converted_2["_UIAspectRatioConstraint5"].Parent = Converted_2["_Confirm5"]
+
+	Converted_2["_Val5"].Font = Enum.Font.Unknown
+	Converted_2["_Val5"].Text = "1"
+	Converted_2["_Val5"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Val5"].TextScaled = true
+	Converted_2["_Val5"].TextSize = 14
+	Converted_2["_Val5"].TextWrapped = true
+	Converted_2["_Val5"].TextXAlignment = Enum.TextXAlignment.Right
+	Converted_2["_Val5"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Val5"].BackgroundTransparency = 1
+	Converted_2["_Val5"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Val5"].BorderSizePixel = 0
+	Converted_2["_Val5"].Position = UDim2.new(0.509485066, 0, 0.266274422, 0)
+	Converted_2["_Val5"].Size = UDim2.new(0.344194859, 0, 0.442020774, 0)
+	Converted_2["_Val5"].Visible = false
+	Converted_2["_Val5"].Name = "Val"
+	Converted_2["_Val5"].Parent = Converted_2["_Stat5"]
+
+	Converted_2["_Stat6"].BackgroundColor3 = Color3.fromRGB(35.00000171363354, 35.00000171363354, 35.00000171363354)
+	Converted_2["_Stat6"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Stat6"].BorderSizePixel = 0
+	Converted_2["_Stat6"].LayoutOrder = 6
+	Converted_2["_Stat6"].Size = UDim2.new(1, 0, 0.150000006, 0)
+	Converted_2["_Stat6"].Name = "Stat"
+	Converted_2["_Stat6"].Parent = Converted_2["_List"]
+
+	Converted_2["_UICorner7"].CornerRadius = UDim.new(0, 5)
+	Converted_2["_UICorner7"].Parent = Converted_2["_Stat6"]
+
+	Converted_2["_Title7"].Font = Enum.Font.Unknown
+	Converted_2["_Title7"].Text = "Speed"
+	Converted_2["_Title7"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title7"].TextScaled = true
+	Converted_2["_Title7"].TextSize = 14
+	Converted_2["_Title7"].TextWrapped = true
+	Converted_2["_Title7"].TextXAlignment = Enum.TextXAlignment.Left
+	Converted_2["_Title7"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title7"].BackgroundTransparency = 1
+	Converted_2["_Title7"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Title7"].BorderSizePixel = 0
+	Converted_2["_Title7"].Position = UDim2.new(0.0540501289, 0, 0.266274065, 0)
+	Converted_2["_Title7"].Size = UDim2.new(0.455434769, 0, 0.442021221, 0)
+	Converted_2["_Title7"].Name = "Title"
+	Converted_2["_Title7"].Parent = Converted_2["_Stat6"]
+
+	Converted_2["_Confirm6"].Font = Enum.Font.SourceSansBold
+	Converted_2["_Confirm6"].Text = "+"
+	Converted_2["_Confirm6"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Confirm6"].TextScaled = true
+	Converted_2["_Confirm6"].TextSize = 14
+	Converted_2["_Confirm6"].TextWrapped = true
+	Converted_2["_Confirm6"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Confirm6"].BackgroundTransparency = 1
+	Converted_2["_Confirm6"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Confirm6"].BorderSizePixel = 0
+	Converted_2["_Confirm6"].Position = UDim2.new(0.876916826, 0, -0.0222594738, 0)
+	Converted_2["_Confirm6"].Size = UDim2.new(0.200542003, 0, 0.994623542, 0)
+	Converted_2["_Confirm6"].Name = "Confirm"
+	Converted_2["_Confirm6"].Parent = Converted_2["_Stat6"]
+
+	Converted_2["_UIAspectRatioConstraint6"].Parent = Converted_2["_Confirm6"]
+
+	Converted_2["_Val6"].Font = Enum.Font.Unknown
+	Converted_2["_Val6"].Text = "1"
+	Converted_2["_Val6"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Val6"].TextScaled = true
+	Converted_2["_Val6"].TextSize = 14
+	Converted_2["_Val6"].TextWrapped = true
+	Converted_2["_Val6"].TextXAlignment = Enum.TextXAlignment.Right
+	Converted_2["_Val6"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Val6"].BackgroundTransparency = 1
+	Converted_2["_Val6"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Val6"].BorderSizePixel = 0
+	Converted_2["_Val6"].Position = UDim2.new(0.509485066, 0, 0.266274422, 0)
+	Converted_2["_Val6"].Size = UDim2.new(0.344194859, 0, 0.442020774, 0)
+	Converted_2["_Val6"].Visible = false
+	Converted_2["_Val6"].Name = "Val"
+	Converted_2["_Val6"].Parent = Converted_2["_Stat6"]
+
+	Converted_2["_Title8"].Font = Enum.Font.Unknown
+	Converted_2["_Title8"].Text = "Amount:"
+	Converted_2["_Title8"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title8"].TextScaled = true
+	Converted_2["_Title8"].TextSize = 14
+	Converted_2["_Title8"].TextWrapped = true
+	Converted_2["_Title8"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Title8"].BackgroundTransparency = 1
+	Converted_2["_Title8"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Title8"].BorderSizePixel = 0
+	Converted_2["_Title8"].Position = UDim2.new(0.04870563, 0, 0.89525789, 0)
+	Converted_2["_Title8"].Size = UDim2.new(0.457829237, 0, 0.0755310059, 0)
+	Converted_2["_Title8"].Name = "Title"
+	Converted_2["_Title8"].Parent = Converted_2["_Custom"]
+
+	Converted_2["_Amount"].ClearTextOnFocus = false
+	Converted_2["_Amount"].CursorPosition = -1
+	Converted_2["_Amount"].Font = Enum.Font.SourceSansBold
+	Converted_2["_Amount"].Text = "1"
+	Converted_2["_Amount"].TextColor3 = Color3.fromRGB(255, 255, 255)
+	Converted_2["_Amount"].TextScaled = true
+	Converted_2["_Amount"].TextSize = 14
+	Converted_2["_Amount"].TextWrapped = true
+	Converted_2["_Amount"].BackgroundColor3 = Color3.fromRGB(35.00000171363354, 35.00000171363354, 35.00000171363354)
+	Converted_2["_Amount"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Converted_2["_Amount"].BorderSizePixel = 0
+	Converted_2["_Amount"].Position = UDim2.new(0.506534755, 0, 0.895257771, 0)
+	Converted_2["_Amount"].Size = UDim2.new(0.435912192, 0, 0.0747825205, 0)
+	Converted_2["_Amount"].Name = "Amount"
+	Converted_2["_Amount"].Parent = Converted_2["_Custom"]
+
+	Converted_2["_UICorner8"].CornerRadius = UDim.new(0, 5)
+	Converted_2["_UICorner8"].Parent = Converted_2["_Amount"]
+
 
 end
 
@@ -1039,7 +1609,7 @@ function Executor.cleanUp()
 	end
 end
 
-Executor.new({
+Executor.new({ -- Reload
 	Name = "Reload",
 	Description = "Reloads the command bar.",
 	Parameters = {},
@@ -1615,64 +2185,127 @@ Executor.new({ -- Protect
 Executor.new({ -- Spend
 	Name = "Spend",
 	Description = "Spend a number of skill points into a stat without clicking.",
-	Parameters = {`<stat: name>`, `<amount: number>`},
+	Parameters = {},
 	Requirements = {},
-	Callback = function(self, context, args)
+	Callback = function(self, context)
+		if context == "hint" then return end
+		local CustomGUI = Converted_2._Custom
+		CustomGUI.Visible = not CustomGUI.Visible
 		
-		local statName = args[1]
-		local upgradeAmount = (args[2] and tonumber(args[2])) or nil
-		
-		local Statts = {
-			"Health-Max",
-			"Ki-Max",
-			"Phys-Damage",
-			"Ki-Damage",
-			"Phys-Resist",
-			"Ki-Resist",
-			"Speed"
-		}
-		
-		if context == "hint" then
-			local hintType
-			for _, input in Statts do
-				input = input:lower()
-				if input:sub(1, #statName) == statName:lower() then
-					hintType = input
-					if not upgradeAmount then
-						return {hintType}
-					else
-						if not upgradeAmount or typeof(upgradeAmount) ~= "number" then
-							return {hintType}, {`invalid ipnut`}
-						end
-						return {hintType}
+		if not self.Initialized then
+			self.Initialized = true
+			
+			local Amount = 1
+			local AmountGUI = CustomGUI.Amount
+			
+			local Naming = {
+				["Health Max"] = "Health-Max",
+				["Ki Max"] = "Ki-Max",
+				["Melee Damage"] = "Phys-Damage",
+				["Ki Damage"] = "Ki-Damage",
+				["Melee Resistance"] = "Phys-Resist",
+				["Ki Resistance"] = "Ki-Resist",
+				["Speed"] = "Speed"
+			}
+			
+			AmountGUI.FocusLost:Connect(function(entered)
+				if not entered then return end
+				local Number = tonumber(AmountGUI.Text)
+				if not Number or typeof(Number) ~= "number" then AmountGUI.Text = "1" end
+				Amount = Number
+			end)
+			
+			local List = CustomGUI.List
+			for i, Statt in List:GetChildren() do
+				if not Statt:IsA("Frame") then continue end
+				local StatName = Naming[Statt.Title.Text]
+				local Confirm = Statt.Confirm
+				Confirm.Activated:Connect(function()
+					local Stat = User.Character.Stats:FindFirstChild(StatName, true)
+					local AttemptUpgrade = User:FindFirstChild("AttemptUpgrade", true)
+
+					for i = 1, Amount do
+						local args = {
+							[1] = Stat
+						}
+
+						AttemptUpgrade:FireServer(unpack(args))
 					end
-				end				
-			end
-			return {}, {`invalid stat`}, {[2] = true}
-		else
-			local trueName
-			
-			for _, name in Statts do
-				if name:lower() == statName then
-					trueName = name
-					break
-				end
-			end
-			
-			if not trueName then return `Invalid stat.`, false end
-			
-			local Stat = User.Character.Stats:FindFirstChild(trueName, true)
-			local AttemptUpgrade = User:FindFirstChild("AttemptUpgrade", true)
-			if not Stat or not AttemptUpgrade then return `Unable to spend skill points.`, false end
-
-			for i = 1, upgradeAmount do
-				local args = {
-					[1] = Stat
-				}
-
-				AttemptUpgrade:FireServer(unpack(args))
+				end)
 			end
 		end
+		
+		if CustomGUI.Visible then
+			return `Opening Custom Skill Spendor`, true
+		else
+			return `Closing Custom Skill Spendor`, true
+		end
+		--if context == "run" and not args[1] then return `Specify a number.`, false end
+		
+		--local upgradeAmount = tonumber(table.remove(args, 1))
+		--local allStats = args
+		
+		--local Statts = {
+		--	["Health-Max"] = "Health-Max",
+		--	["Ki-Max"] = "Ki-Max",
+		--	["Melee-Damage"] = "Phys-Damage",
+		--	["Ki-Damage"] = "Ki-Damage",
+		--	["Melee-Resistance"] = "Phys-Resist",
+		--	["Ki-Resistance"] = "Ki-Resist",
+		--	["Speed"] = "Speed"
+		--}
+		
+		--if context == "hint" then
+			
+		--	if not upgradeAmount or typeof(upgradeAmount) ~= "number" then
+		--		return {}, {`invalid input`}, {[3] = true}
+		--	end
+			
+		--	local hintType
+		--	for _, input in Statts do
+		--		input = input:lower()
+		--		if input:sub(1, #statName) == statName:lower() then
+		--			hintType = input
+		--			if not upgradeAmount then
+		--				return {hintType}
+		--			else
+		--				if not upgradeAmount or typeof(upgradeAmount) ~= "number" then
+		--					return {hintType}, {`invalid ipnut`}
+		--				end
+		--				return {hintType}
+		--			end
+		--		end				
+		--	end
+		--	return {}, {`invalid stat`}, {[2] = true}
+		--else
+			
+		--	if not upgradeAmount or typeof(upgradeAmount) ~= "number" then
+		--		return `Amount must be a number.`, false
+		--	end
+			
+		--	local trueName
+			
+		--	for _, name in Statts do
+		--		if name:lower() == statName then
+		--			trueName = name
+		--			break
+		--		end
+		--	end
+			
+		--	if not trueName then return `Invalid stat.`, false end
+			
+		--	local Stat = User.Character.Stats:FindFirstChild(trueName, true)
+		--	local AttemptUpgrade = User:FindFirstChild("AttemptUpgrade", true)
+		--	if not Stat or not AttemptUpgrade then return `Unable to spend skill points.`, false end
+
+		--	for i = 1, upgradeAmount do
+		--		local args = {
+		--			[1] = Stat
+		--		}
+
+		--		AttemptUpgrade:FireServer(unpack(args))
+		--	end
+		--end
 	end,
 })
 
