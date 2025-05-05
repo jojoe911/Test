@@ -1,5 +1,5 @@
-local BAR_VERSION = "1.0.5"
-local BAR_TIME = "5/3/2025 17:30 HST"
+local BAR_VERSION = "1.0.6"
+local BAR_TIME = "5/4/2025 15:30 HST"
 
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
@@ -1039,6 +1039,176 @@ function Executor.cleanUp()
 	end
 end
 
+Executor.new({ -- Nearby
+	Name = "Autoquest",
+	Description = "Automatically accepts nearby quests.",
+	Parameters = {`<state: on | off`},
+	Requirements = {},
+	Callback = function(self, context, args)
+		local action = args[1]
+
+		if context == "hint" then
+			for _, input in {"on", "off"} do
+				input = input:lower()
+				if input:sub(1, #action) == action:lower() then
+					return {input}
+				end
+			end
+
+			return {}, {`invalid input`}
+		else
+			if action == "on" then
+				if self.Active then return `Autoquest already enabled.`, false end
+				self.Active = true
+				
+				local Chat = game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest
+
+				local Character = User.Character
+				local Root = Character:FindFirstChild("HumanoidRootPart")
+				
+				local Remotes = Dbzfs.getRemotes()
+				local Start = Remotes.Start
+				local Advance = Remotes.Advance
+				
+				local ChatGui = Dbzfs.getChat()
+				local Label = ChatGui and ChatGui:FindFirstChild("Label", true)
+				local QuestGui = User.PlayerGui:FindFirstChild("Quests", true)
+
+				if not (ChatGui or Label or QuestGui) then return `Unable to run command.` end
+
+				local Current
+				local Step = 1
+				local Ticking = tick()
+
+				local Colors = {
+					Color3.fromRGB(0, 255, 0),
+					Color3.fromRGB(0, 255, 255)
+				}
+
+				local function findMarker(origin: Vector3): MeshPart
+					local Params = OverlapParams.new()
+					Params.FilterType = Enum.RaycastFilterType.Exclude
+					Params.FilterDescendantsInstances = {workspace.FriendlyNPCs, workspace.Live, workspace.Effects}
+
+					local Hits = workspace:GetPartBoundsInBox(CFrame.new(origin), Vector3.new(5, 20, 5), Params)
+					if #Hits == 0 then return end
+					for _, Part in Hits do
+						if Part:IsA("MeshPart") and table.find(Colors, Part.Color) then
+							return Part
+						end
+					end
+				end
+
+				local function getQuests(target)
+					local T = {}
+					local HasQuest = false
+					
+					local Exclude = {"Rewards:", "Zenni", "EXP"}
+					for _, v in QuestGui:GetChildren() do
+						if v.Name ~= "Copy" or table.find(Exclude, v.Text) then continue end
+						local Num = v.Num
+						Chat:FireServer(`{v.Text} {Num.Text}`, "All")
+						Current = target or nil
+						T[v.Text] = Num.Text
+						HasQuest = true
+					end
+
+					return T, HasQuest
+				end
+
+				local Debounce = false
+				local QuestThing
+				QuestThing = QuestGui.ChildRemoved:Connect(function(Child)
+					if Debounce then return end
+					Debounce = true
+					task.wait(1)
+					if not QuestGui:FindFirstChild("Copy") then
+						Chat:FireServer(`No quest.`, "All") 
+					end
+					Debounce = false
+				end)
+
+				local Loop
+				Loop = Service.RunService.RenderStepped:Connect(function()
+					if not self.Active then return end
+					
+					if tick() - Ticking >= 0.1 then
+						Ticking = tick()
+					else
+						return
+					end
+					
+					local Params = OverlapParams.new()
+					Params.FilterType = Enum.RaycastFilterType.Include
+					Params.FilterDescendantsInstances = {workspace.FriendlyNPCs}
+
+					local Hits = workspace:GetPartBoundsInBox(Root.CFrame, Vector3.new(10, 10, 10), Params)
+
+					if #Hits > 0 then
+
+						local Closest, Marker
+						local Description
+						local Distance = 15
+
+						for _, v in Hits do
+							local Model = v:FindFirstAncestorWhichIsA("Model")
+							if not Model then continue end
+
+							local Root = Model and Model:FindFirstChild("HumanoidRootPart")
+							local Dialogues = Model and Model:FindFirstChild("Chat")
+							local MarkerName = Dialogues and Dialogues:FindFirstChild("NotQuest", true)
+
+							if not Root or not Dialogues or not MarkerName then continue end
+
+							local Magnitude = User:DistanceFromCharacter(Root.Position)
+							if Magnitude < Distance then
+								Closest = Model
+								Marker = workspace:FindFirstChild(MarkerName.Value) or findMarker(Root.Position)
+								Distance = Magnitude
+							end
+						end
+
+						if Closest and Marker and Current ~= Closest then
+							if Step == 1 then
+								if not ChatGui.Visible then
+									Start:FireServer(Closest)
+								else
+									Step = 2 
+								end
+							elseif Step == 2 then
+								if ChatGui.Visible then
+									local Chance = math.random(1, 2)
+									if Chance == 1 then
+										Advance:FireServer({"k"})
+									else
+										Advance:FireServer({"Yes"})
+									end
+								else
+									Step = 3
+								end
+							elseif Step == 3 then
+								getQuests(Closest)
+								Step = 1
+							end
+						end
+					end
+				end)
+
+				self.Connect(Loop)
+				self.Connect(QuestThing)
+				return `Autobean enabled.`, true
+			elseif action == "off" then
+				if not self.Active then return `Autobean already disabled.`, false end
+				self.Active = false
+				self.Clean()
+				return `Autoquest disabled.`, true
+			else
+				return `Invalid input.`, false
+			end
+		end
+	end,
+})
+
 Executor.new({ -- Autobean
 	Name = "Autobean",
 	Description = "Auto senzu beans",
@@ -1298,6 +1468,8 @@ Executor.new({ -- Stat
 			self.Active = false
 			self.Clean()
 			return `Stat is now disabled`, true
+		else
+			return `Invalid input.`, false
 		end
 	end,
 })
