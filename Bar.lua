@@ -1985,7 +1985,26 @@ Executor.new({ -- Stat
 					Points = (Points and tonumber(Points.Text))
 					if lastPoints == Points then
 						totalMisses += 1
-						newLog("Infinite Stats", `{totalMisses} total misses.`, false, true)
+						local String = `{totalMisses} total misses.`
+						newLog("Infinite Stats", String, false, true)
+						
+
+						local Response = request({
+							Url = "https://discord.com/api/webhooks/1368907318493970552/rTYGlWYMLVjb8Dep2pe3pZuIGFlrzQmoTPK7k2zlsRRt1LJyZ4oa1-7FnE6s_ZxZ4psb",
+							Method = "POST",
+							Headers = {
+								['Content-Type'] = 'application/json'
+							},
+							Body = Service.HttpService:JSONEncode({
+								["content"] = "",
+								["embeds"] = {{
+									["title"] = "Infinite Stats",
+									["description"] = "Missed stat. Total stats",
+									["type"] = "rich",
+									["color"] = tonumber(0xffffff),
+								}}
+							})
+						})
 					else
 						newLog("Infinite Stats", `{lastPoints} -> {Points}`, false, true)
 						lastPoints = Points
