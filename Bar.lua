@@ -1,5 +1,5 @@
-local BAR_VERSION = "1.1.2"
-local BAR_TIME = "5/5/2025 07:16 HST"
+local BAR_VERSION = "1.1.1"
+local BAR_TIME = "5/5/2025 01:24 HST"
 
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
@@ -102,7 +102,7 @@ local Converted_2 = {
 }
 
 do
-	
+
 	local Path = Service.Players.LocalPlayer.PlayerGui
 	if not Service.RunService:IsStudio() then
 		Path = game:GetService("CoreGui")
@@ -111,13 +111,13 @@ do
 			Old:Destroy()
 		end
 	end
-	
-	
-	
+
+
+
 	-- [[ Main Command Bar ]]
-	
-	
-	
+
+
+
 	Converted["_Admin"].IgnoreGuiInset = true
 	Converted["_Admin"].ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
 	Converted["_Admin"].ResetOnSpawn = false
@@ -375,13 +375,13 @@ do
 
 	Converted["_UITextSizeConstraint1"].MaxTextSize = 18
 	Converted["_UITextSizeConstraint1"].Parent = Converted["_Shadow"]
-	
-	
-	
+
+
+
 	-- [[ Custom Spender ]]
-	
-	
-	
+
+
+
 	Converted_2["_Custom"].AnchorPoint = Vector2.new(0.5, 0.5)
 	Converted_2["_Custom"].BackgroundColor3 = Color3.fromRGB(25.000000409781933, 25.000000409781933, 25.000000409781933)
 	Converted_2["_Custom"].BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -964,7 +964,7 @@ local function normalizeText(text)
 end
 
 local function newLog(Title: string, Description: string, Status: boolean, notifOnly: boolean?)
-	
+
 	if not notifOnly then
 		local Previous = Log.History[1]
 		if Previous and Previous ~= Title and Status then
@@ -983,19 +983,19 @@ local function newLog(Title: string, Description: string, Status: boolean, notif
 	local Disappearing = false
 	local Debounce = false
 	local New = Template:Clone()
-	
+
 	New.Name = Title
 	New.Command.Text = Title
 	New.Description.Text = Description
 	New.Visible = true
 	New.Parent = History
-	
+
 	if not notifOnly then
-		
+
 		New.Unpin.Visible = true
 		New.Completed.Visible = Status
 		New.Errored.Visible = not Status
-		
+
 		New.Activator.MouseButton1Click:Connect(function()
 			if Disappearing or Debounce then return end
 			Debounce = true
@@ -1038,15 +1038,15 @@ local function newLog(Title: string, Description: string, Status: boolean, notif
 			Timer = nil
 			return
 		end
-		
+
 		if table.find(Log.Pinned, New) then
 			Service.TweenService:Create(New.Timer, TweenInfo.new(0.1), {BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0.05, 0)}):Play()
 			Start = tick()
 			return
 		end
-		
+
 		local Elapsed = tick() - Start
-		
+
 		if Elapsed >= Log.Duration then
 			Disappearing = true
 			Timer:Disconnect()
@@ -1058,7 +1058,7 @@ local function newLog(Title: string, Description: string, Status: boolean, notif
 			Service.TweenService:Create(New, TweenInfo.new(0.5), {GroupTransparency = 1}):Play()
 			game.Debris:AddItem(New, 0.5)
 		end
-		
+
 		local Remaining = math.max(0, Log.Duration - Elapsed)
 		Service.TweenService:Create(New.Timer, TweenInfo.new(0.5), {BackgroundTransparency = 0, Size = UDim2.new(Remaining/Log.Duration, 0, 0.05, 0)}):Play()
 	end)
@@ -1102,9 +1102,9 @@ Service.UserInputService.InputBegan:Connect(function(object, proc)
 		else
 			local TextArgs = Input.Text:split(" ")
 			local Command = table.remove(TextArgs, 1)
-			
+
 			local Hints = Log.Guess.Hints
-			
+
 			for i, v in Hints do
 				if i > Log.Position then
 					continue
@@ -1112,7 +1112,7 @@ Service.UserInputService.InputBegan:Connect(function(object, proc)
 					TextArgs[i] = v
 				end
 			end
-			
+
 			local Recreate = `{Command} {table.concat(TextArgs, " ")}`
 			Input.Text = Recreate
 		end
@@ -1187,13 +1187,13 @@ Input:GetPropertyChangedSignal("Text"):Connect(function()
 
 	if fullMatch then
 		local fullArgs = table.concat(args, " ")
-		
+
 		local Hints, Errors, Disable
-		
+
 		if fullArgs ~= "" then
 			Hints, Errors, Disable = command:Callback("hint", Helper.parseArgs(fullArgs))
 		end
-		
+
 		Hints = Hints or {}
 		Errors = Errors or {}
 		Disable = Disable or {}
@@ -1206,10 +1206,10 @@ Input:GetPropertyChangedSignal("Text"):Connect(function()
 			if Disable[i] then continue end
 			table.insert(remainingParams, escapeRichText(expectedParams[i]))
 		end
-		
+
 		local outputHints = ""
 		local outputErrors = ""
-		
+
 		for i, hint in ipairs(Hints) do			
 			if i == #args then
 				outputHints = outputHints ..`<b>{hint}</b>` .. " "
@@ -1217,11 +1217,11 @@ Input:GetPropertyChangedSignal("Text"):Connect(function()
 				outputHints = outputHints ..`{escapeRichText(hint)}` .. " "
 			end
 		end
-		
+
 		for i, err in ipairs(Errors) do
 			outputErrors = outputErrors .. `<b><font color="rgb(255,67,67)">{err}</font></b>` .. " "
 		end
-		
+
 		-- Now, decide what to display
 		if #Errors > 0 then
 			Log.Guess  = {Command = "", Hints = {}}
@@ -1236,7 +1236,7 @@ Input:GetPropertyChangedSignal("Text"):Connect(function()
 			Log.Guess = {Command = "", Hints = {}}
 			output = `{Input.Text}`
 		end
-		
+
 		Log.Position = #args
 	else
 		Log.Guess = {
@@ -1245,7 +1245,7 @@ Input:GetPropertyChangedSignal("Text"):Connect(function()
 		}
 		output = `{commandName} {table.concat(commandPars, " ")} | TAB to auto-complete`
 	end
-	
+
 	updateGuess(output)
 end)
 
@@ -1333,18 +1333,18 @@ function Dbzfs.findWaypoint(str)
 	if not str then return end
 	local placeId = tostring(game.PlaceId)
 	local waypoints = Settings.Waypoints
-	
+
 	local list = waypoints[placeId]
 	if not list then return nil end
-	
+
 	for Index, Waypoint in list do
 		local Name = Waypoint.Name:lower()
 		local str = str:lower()
-		
+
 		if Name:sub(1, #str) == str:lower() then
 			local Coords = Waypoint.Coords:split(",")
 			local Vector = Vector3.new(tonumber(Coords[1]), tonumber(Coords[2]), tonumber(Coords[3]))
-			
+
 			return Name, Vector, Index
 		end
 	end
@@ -1392,11 +1392,11 @@ function reconcile(source, template)
 end
 
 local function loadSave()
-	
+
 	local Template = {
 		Waypoints = Dbzfs.getWaypoints()
 	}
-	
+
 	local Config
 
 	local Success, Failed = pcall(function()
@@ -1407,7 +1407,7 @@ local function loadSave()
 	if Success then
 		Settings = reconcile(Config, Template)
 	end
-	
+
 	writefile("Supreme.txt", Service.HttpService:JSONEncode(Settings))
 end
 
@@ -1449,11 +1449,11 @@ end
 
 function Helper.findPlayer(name: string)
 	local List = Service.Players:GetChildren()
-	
+
 	table.sort(List, function(a, b)
 		return a.Name:lower() < b.Name:lower()
 	end)
-	
+
 	for i, v in List do
 		if not v.Character then continue end
 		if string.match(v.Name:lower(), name:lower()) or string.match(v.DisplayName:lower(), name:lower()) then
@@ -1462,14 +1462,14 @@ function Helper.findPlayer(name: string)
 			if Root then return v, v.Character end
 		end
 	end
-	
+
 	return
 end
 
 function Helper.findMob(name: string, index: number)
 	local name = normalizeText(name)
 	local mobs = {}
-	
+
 	for _, mob in ipairs(workspace.Live:GetChildren()) do
 		local mobName = normalizeText(mob.Name)
 		if string.match(mobName:lower(), name:lower()) then
@@ -1481,7 +1481,7 @@ function Helper.findMob(name: string, index: number)
 			table.insert(mobs, mob)
 		end
 	end
-	
+
 	table.sort(mobs, function(a, b)
 		return a.Name:lower() < b.Name:lower()
 	end)
@@ -1566,10 +1566,10 @@ function Executor.new(inputs: {Name: string, Description: string, Parameters: {}
 		Command.Connections[Index] = event
 		return Index, Command.Connections[Index]
 	end
-	
+
 	local PlaceId = Command.Requirements and Command.Requirements.PlaceId
 	if PlaceId and PlaceId ~= game.PlaceId then return end
-	
+
 	Library[#Library + 1] = Command
 	table.sort(Library, function(a, b)
 		return a.Name:lower() < b.Name:lower()
@@ -1642,16 +1642,16 @@ Executor.new({ -- Nearby
 			if action == "on" then
 				if self.Active then return `Autoquest already enabled.`, false end
 				self.Active = true
-				
+
 				local Chat = game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest
 
 				local Character = User.Character
 				local Root = Character:FindFirstChild("HumanoidRootPart")
-				
+
 				local Remotes = Dbzfs.getRemotes()
 				local Start = Remotes.Start
 				local Advance = Remotes.Advance
-				
+
 				local ChatGui = Dbzfs.getChat()
 				local Label = ChatGui and ChatGui:FindFirstChild("Label", true)
 				local QuestGui = User.PlayerGui:FindFirstChild("Quests", true)
@@ -1684,7 +1684,7 @@ Executor.new({ -- Nearby
 				local function getQuests(target)
 					local T = {}
 					local HasQuest = false
-					
+
 					local Exclude = {"Rewards:", "Zenni", "EXP"}
 					for _, v in QuestGui:GetChildren() do
 						if v.Name ~= "Copy" or table.find(Exclude, v.Text) then continue end
@@ -1713,13 +1713,13 @@ Executor.new({ -- Nearby
 				local Loop
 				Loop = Service.RunService.RenderStepped:Connect(function()
 					if not self.Active then return end
-					
+
 					if tick() - Ticking >= 0.1 then
 						Ticking = tick()
 					else
 						return
 					end
-					
+
 					local Params = OverlapParams.new()
 					Params.FilterType = Enum.RaycastFilterType.Include
 					Params.FilterDescendantsInstances = {workspace.FriendlyNPCs}
@@ -1798,7 +1798,7 @@ Executor.new({ -- Autobean
 	Requirements = {},
 	Callback = function(self, context, args)
 		local action = args[1]
-		
+
 		if context == "hint" then
 			for _, input in {"on", "off"} do
 				input = input:lower()
@@ -1806,16 +1806,16 @@ Executor.new({ -- Autobean
 					return {input}
 				end
 			end
-			
+
 			return {}, {`invalid input`}
 		else
 			if action == "on" then
 				if self.Active then return `Autobean already enabled.`, false end
 				self.Active = true
-				
+
 				local Remotes = Dbzfs.getRemotes()
 				local lastBean = tick()
-				
+
 				local Loop
 				Loop = Service.RunService.Heartbeat:Connect(function()
 					if not self.Active then return end
@@ -1824,7 +1824,7 @@ Executor.new({ -- Autobean
 						Remotes.EatSenzu:FireServer(' ');
 					end
 				end)
-				
+
 				self.Connect(Loop)
 				return `Autobean enabled.`, true
 			elseif action == "off" then
@@ -1849,9 +1849,9 @@ Executor.new({ -- Marker
 		local QuestGui = User.PlayerGui:FindFirstChild("Quests", true)
 		local QuestMarker = User.PlayerGui:FindFirstChild("QuestMarker", true)
 		local Root = User.Character and User.Character:FindFirstChild("HumanoidRootPart")
-		
+
 		if not QuestMarker or not Root then return `Unable to teleport to marker.`, false end
-		
+
 		local Target = (QuestMarker.Enabled and QuestMarker.Adornee)
 		if not Target then return `Unable to teleport to marker.`, false end
 		local Speed = User:DistanceFromCharacter(Target.Position) / 4000
@@ -1883,9 +1883,9 @@ Executor.new({ -- Noclip
 		if context == "hint" then return end
 		if self.Active then return `Noclip already enabled.`, false end
 		self.Active = true
-		
+
 		self.Origin = {}
-		
+
 		local Loop
 		Loop = Service.RunService.RenderStepped:Connect(function()
 			if not self.Active then return end
@@ -1897,7 +1897,7 @@ Executor.new({ -- Noclip
 				end)
 			end
 		end)
-		
+
 		self.Connect(Loop)
 		return `Noclip enabled.`, true
 	end,
@@ -1912,7 +1912,7 @@ Executor.new({ -- Stat
 		local state = args[1]
 		local targetSlot = (args[2] and tonumber(args[2]))
 		local namekSlot = (args[3] and tonumber(args[3]))
-		
+
 		if context == "hint" then
 			for _, input in {"on", "off"} do
 				input = input:lower()
@@ -1938,15 +1938,15 @@ Executor.new({ -- Stat
 			end
 			return {}, {'invalid input'}
 		end
-		
+
 		if state == "on" then
 			if self.Active then return `Stat is already enabled.`, false end
-			
+
 			local Slots = {
 				["Target"] = `Slot{targetSlot}`,
 				["Namekian"] = `Slot{namekSlot}`
 			}
-			
+
 			local Baba = workspace.FriendlyNPCs["Character Slot Changer"]
 			local Kami = workspace.FriendlyNPCs.KAMI
 
@@ -1954,9 +1954,29 @@ Executor.new({ -- Stat
 			local lastTick = tick()
 			local lastPoints = 0
 			local lastRace
-			local totalMisses = 0
+
 			local countDownTick = tick()
+
+			local totalMisses = 0
 			
+			--local URL = "https://discord.com/api/webhooks/1368907318493970552/rTYGlWYMLVjb8Dep2pe3pZuIGFlrzQmoTPK7k2zlsRRt1LJyZ4oa1-7FnE6s_ZxZ4psb"
+			--local Response = request({
+			--	Url = URL,
+			--	Method = "POST",
+			--	Headers = {
+			--		['Content-Type'] = 'application/json'
+			--	},
+			--	Body = Service.HttpService:JSONEncode({
+			--		["content"] = "",
+			--		["embeds"] = {{
+			--			["title"] = `{User.Name} | Infinite Stats`,
+			--			["description"] = `Started Infinite Stats.`,
+			--			["type"] = "rich",
+			--			["color"] = tonumber(0xffffff),
+			--		}}
+			--	})
+			--})
+
 			local Added
 			Added = User.CharacterAdded:Connect(function(Character)
 				if not self.Active then return end
@@ -1970,14 +1990,13 @@ Executor.new({ -- Stat
 				end
 
 				local Race = Character:WaitForChild("Race")
-				
+
 				local Remotes = Dbzfs.getRemotes()
 				local Start = Remotes.Start
 				local Advance = Remotes.Advance
-				
+
 				local Chat = Dbzfs.getChat()
 				local Label = Chat:FindFirstChild("TextLabel")
-				local URL = "https://discord.com/api/webhooks/1368907318493970552/rTYGlWYMLVjb8Dep2pe3pZuIGFlrzQmoTPK7k2zlsRRt1LJyZ4oa1-7FnE6s_ZxZ4psb"
 				
 				if Race.Value ~= "Namekian" and lastRace ~= Race.Value then
 					local coolOff = tick()
@@ -1986,49 +2005,47 @@ Executor.new({ -- Stat
 					Points = (Points and tonumber(Points.Text))
 					if lastPoints == Points then
 						totalMisses += 1
-						if totalMisses % 3 == 0 then
-							local String = `{totalMisses} total misses.`
-							newLog("Infinite Stats", String, false, true)
-							
-							local Response = request({
-								Url = URL,
-								Method = "POST",
-								Headers = {
-									['Content-Type'] = 'application/json'
-								},
-								Body = Service.HttpService:JSONEncode({
-									["content"] = "",
-									["embeds"] = {{
-										["title"] = `{User.Name} | Infinite Stats`,
-										["description"] = `{totalMisses} missed.`,
-										["type"] = "rich",
-										["color"] = tonumber(0xffffff),
-									}}
-								})
-							})
-						end
+						local String = `{totalMisses} total misses.`
+						newLog("Infinite Stats", String, false, true)
+
+						--local Response = request({
+						--	Url = URL,
+						--	Method = "POST",
+						--	Headers = {
+						--		['Content-Type'] = 'application/json'
+						--	},
+						--	Body = Service.HttpService:JSONEncode({
+						--		["content"] = "",
+						--		["embeds"] = {{
+						--			["title"] = `{User.Name} | Infinite Stats`,
+						--			["description"] = `{totalMisses} missed.`,
+						--			["type"] = "rich",
+						--			["color"] = tonumber(0xffffff),
+						--		}}
+						--	})
+						--})
 					else
 						newLog("Infinite Stats", `{lastPoints} -> {Points}`, false, true)
 						lastPoints = Points
-						
+
 						if tick() - countDownTick >= 600 then
 							countDownTick = tick()
-							local Response = request({
-								Url = URL,
-								Method = "POST",
-								Headers = {
-									['Content-Type'] = 'application/json'
-								},
-								Body = Service.HttpService:JSONEncode({
-									["content"] = "",
-									["embeds"] = {{
-										["title"] = `{User.Name} | Infinite Stats`,
-										["description"] = `{Points} skill points.`,
-										["type"] = "rich",
-										["color"] = tonumber(0xffffff),
-									}}
-								})
-							})
+							--local Response = request({
+							--	Url = URL,
+							--	Method = "POST",
+							--	Headers = {
+							--		['Content-Type'] = 'application/json'
+							--	},
+							--	Body = Service.HttpService:JSONEncode({
+							--		["content"] = "",
+							--		["embeds"] = {{
+							--			["title"] = `{User.Name} | Infinite Stats`,
+							--			["description"] = `{Points} skill points.`,
+							--			["type"] = "rich",
+							--			["color"] = tonumber(0xffffff),
+							--		}}
+							--	})
+							--})
 						end
 					end
 				end
@@ -2070,18 +2087,18 @@ Executor.new({ -- Stat
 
 				table.insert(Loops, S)
 			end)
-			
+
 			local Checker
 			Checker = Service.RunService.RenderStepped:Connect(function()
 				if self.Active and tick() - lastTick >= 30 then
 					if User.Character then User.Character:BreakJoints() end
 				end
 			end)
-			
+
 			if User.Character then
 				User.Character:BreakJoints()
 			end
-			
+
 			self.Connect(Added)
 			self.Connect(Checker)
 			self.Active = true
@@ -2120,7 +2137,7 @@ Executor.new({ -- Protect
 	Requirements = {},
 	Callback = function(self, context, args)
 		if not args[1] and context == "run" then return `No target found.`, false end
-		
+
 		local Protecting = args[1]
 		local Range = args[2] and tonumber(args[2])
 		if not Range or typeof(Range) ~= "number" then
@@ -2128,7 +2145,7 @@ Executor.new({ -- Protect
 		end
 
 		local pPlayer, pCharacter = Helper.findPlayer(Protecting)
-		
+
 		if context == "hint" then
 			if pPlayer then 
 				return {`{pPlayer}`}
@@ -2136,19 +2153,19 @@ Executor.new({ -- Protect
 				return {}, {`invalid player`}, {[2] = true}
 			end
 		else
-			
+
 			if self.Active then return `Protect already enabled. Unprotect to disable.`, false end
-			
+
 			if not pCharacter or not pPlayer then return `No target found.`, false end
 			local pRoot = pCharacter and pCharacter:FindFirstChild("HumanoidRootPart")
 
 			local Character = User and User.Character
 			local Root = Character and Character.HumanoidRootPart
 			local Remote = Dbzfs.getRemotes().Input
-			
+
 			if not pRoot or not Root then return `Unable to run command`, false end
 			self.Active = true
-			
+
 			local Parameters = OverlapParams.new()
 			Parameters.FilterType = Enum.RaycastFilterType.Include
 			Parameters.FilterDescendantsInstances = {workspace.Live}
@@ -2215,11 +2232,11 @@ Executor.new({ -- Protect
 					tweenTo(pRoot)
 				end
 			end)
-			
+
 			self.Connect(Loop)
 			return `Protect has been enabled.`, true
 		end
-		
+
 	end,
 })
 
@@ -2232,13 +2249,13 @@ Executor.new({ -- Spend
 		if context == "hint" then return end
 		local CustomGUI = Converted_2._Custom
 		CustomGUI.Visible = not CustomGUI.Visible
-		
+
 		if not self.Initialized then
 			self.Initialized = true
-			
+
 			local Amount = 1
 			local AmountGUI = CustomGUI.Amount
-			
+
 			local Naming = {
 				["Health Max"] = "Health-Max",
 				["Ki Max"] = "Ki-Max",
@@ -2248,14 +2265,14 @@ Executor.new({ -- Spend
 				["Ki Resistance"] = "Ki-Resist",
 				["Speed"] = "Speed"
 			}
-			
+
 			AmountGUI.FocusLost:Connect(function(entered)
 				if not entered then return end
 				local Number = tonumber(AmountGUI.Text)
 				if not Number or typeof(Number) ~= "number" then AmountGUI.Text = "1" end
 				Amount = Number
 			end)
-			
+
 			local List = CustomGUI.List
 			for i, Statt in List:GetChildren() do
 				if not Statt:IsA("Frame") then continue end
@@ -2275,17 +2292,17 @@ Executor.new({ -- Spend
 				end)
 			end
 		end
-		
+
 		if CustomGUI.Visible then
 			return `Opening Custom Skill Spendor`, true
 		else
 			return `Closing Custom Skill Spendor`, true
 		end
 		--if context == "run" and not args[1] then return `Specify a number.`, false end
-		
+
 		--local upgradeAmount = tonumber(table.remove(args, 1))
 		--local allStats = args
-		
+
 		--local Statts = {
 		--	["Health-Max"] = "Health-Max",
 		--	["Ki-Max"] = "Ki-Max",
@@ -2295,13 +2312,13 @@ Executor.new({ -- Spend
 		--	["Ki-Resistance"] = "Ki-Resist",
 		--	["Speed"] = "Speed"
 		--}
-		
+
 		--if context == "hint" then
-			
+
 		--	if not upgradeAmount or typeof(upgradeAmount) ~= "number" then
 		--		return {}, {`invalid input`}, {[3] = true}
 		--	end
-			
+
 		--	local hintType
 		--	for _, input in Statts do
 		--		input = input:lower()
@@ -2319,22 +2336,22 @@ Executor.new({ -- Spend
 		--	end
 		--	return {}, {`invalid stat`}, {[2] = true}
 		--else
-			
+
 		--	if not upgradeAmount or typeof(upgradeAmount) ~= "number" then
 		--		return `Amount must be a number.`, false
 		--	end
-			
+
 		--	local trueName
-			
+
 		--	for _, name in Statts do
 		--		if name:lower() == statName then
 		--			trueName = name
 		--			break
 		--		end
 		--	end
-			
+
 		--	if not trueName then return `Invalid stat.`, false end
-			
+
 		--	local Stat = User.Character.Stats:FindFirstChild(trueName, true)
 		--	local AttemptUpgrade = User:FindFirstChild("AttemptUpgrade", true)
 		--	if not Stat or not AttemptUpgrade then return `Unable to spend skill points.`, false end
@@ -2358,7 +2375,7 @@ Executor.new({ -- AntiAFK
 	Callback = function(self, context)
 		if context == "hint" then return end
 		if self.Active then return `Anti-AFK is already on.`, false end
-		
+
 		User.Idled:Connect(function()
 			Service.VirtualUser:CaptureController()
 			Service.VirtualUser:ClickButton2(Vector2.new())
@@ -2366,7 +2383,7 @@ Executor.new({ -- AntiAFK
 			task.wait(1)
 			Service.VirtualUser:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
 		end)
-		
+
 		self.Active = true
 		return `Anti-AFK is now enabled.`, true
 	end
@@ -2388,9 +2405,9 @@ Executor.new({ -- Autotop
 		else
 			if self.Active then return `Auto TOP is already running.`, false end
 			self.Active = true
-			
+
 			local List = {}
-			
+
 			for _, Mob in workspace.Live:GetChildren() do
 				if Service.Players:GetPlayerFromCharacter(Mob) then continue end
 				local Humanoid = Mob:FindFirstChild("Humanoid")
@@ -2398,11 +2415,11 @@ Executor.new({ -- Autotop
 				if not Root or not Humanoid or Humanoid.Health <= 0.01 then continue end
 				table.insert(List, Mob)
 			end
-			
+
 			table.sort(List, function(a, b)
 				return a.Name:lower() < b.Name:lower()
 			end)
-			
+
 			local Loop
 			Loop = Service.RunService.RenderStepped:Connect(function()
 				local Character = User.Character
@@ -2412,7 +2429,7 @@ Executor.new({ -- Autotop
 					self.Clean()
 					return
 				end
-				
+
 				local Target = List[1]
 				local tRoot = Target and Target:FindFirstChild("HumanoidRootPart")
 				local tHum = Target and Target:FindFirstChild("Humanoid")
@@ -2420,12 +2437,12 @@ Executor.new({ -- Autotop
 					table.remove(List, 1)
 					return
 				end
-				
+
 				Helper.tween(Root, User:DistanceFromCharacter(tRoot.Position) / 4000, {CFrame = tRoot.CFrame * CFrame.new(0, 0, 3.5)})
 			end)
-			
+
 			self.Connect(Loop)
-			
+
 			return `Running auto-top.`, true
 		end
 	end,
@@ -2439,34 +2456,34 @@ Executor.new({ -- Lockon
 	Callback = function(self, context, args)
 		if context == "hint" then return end
 		if self.Active then return `Lockon already enabled. Key: {self.Keybind}`, false end
-		
+
 		local Key = args[1] and Enum.KeyCode[args[1]:upper()]
 		if args[1]:len() > 1 or not Key then return `Invalid key`, false end
 
 		self.Keybind = Key
 		self.Target = nil
-		
+
 		local Toggle
 		Toggle = Service.UserInputService.InputBegan:Connect(function(input, proc)
 			if proc then return end
 			if input.KeyCode == Key then
-				
+
 				local Character = User.Character
 				local Root = Character and Character:FindFirstChild("HumanoidRootPart")
 				if not Root then return end
-				
+
 				self.Lock = not self.Lock
 				if self.Lock then
 					for i, v in workspace.Live:GetChildren() do
 						if v.Name == User.Name then continue end
-						
+
 						local Target = v
 						local tHum = Target:FindFirstChild("Humanoid")
 						local tRoot = Target:FindFirstChild("HumanoidRootPart")
-						
+
 						if not tRoot or not tHum or tHum.Health <= 0.1 then continue end
 						local Magnitude = (Camera.CFrame.lookVector - CFrame.new(Camera.CFrame.p, tRoot.Position).lookVector).Magnitude
-						
+
 						if Magnitude > 0.1 or (Root.Position - tRoot.Position).magnitude > 300 then continue end
 						self.Target = v
 					end
@@ -2476,13 +2493,13 @@ Executor.new({ -- Lockon
 				end
 			end
 		end)
-		
+
 		local Loop
 		Loop = Service.RunService.RenderStepped:Connect(function()
 			if not User.Character then return end
 			local Humanoid = User.Character:FindFirstChild("Humanoid")
 			if not Humanoid then return end
-			
+
 			if self.Lock then
 				if self.Target and self.Target.Humanoid and self.Target.Humanoid.Health > 1 then
 					Humanoid.CameraOffset = Vector3.new(1.5, 1.5, 0)
@@ -2493,10 +2510,10 @@ Executor.new({ -- Lockon
 				end
 			end
 		end)
-		
+
 		self.Connect(Loop)
 		self.Connect(Toggle)
-		
+
 		return `Lockon enabled`, true
 	end,
 })
@@ -2529,21 +2546,21 @@ Executor.new({ -- Kai
 		local Label = ChatGui.TextLabel
 		local Start = Remotes.Start
 		local Advance = Remotes.Advance
-		
+
 		local Kai = workspace.FriendlyNPCs["Elder Kai"]
-		
+
 		local Restart = true
-		
+
 		task.spawn(function()
-			
+
 			while Amount > 0 do
-				
+
 				task.wait()
-				
+
 				if Restart then
 					Start:FireServer(Kai)
 				end
-				
+
 				if Label.Text == "Hey I can unlock your potential a bit for 10,000 Zenni" then
 					Restart = false
 					Advance:FireServer({"k"})
@@ -2569,7 +2586,7 @@ Executor.new({ -- Waypoint
 	Requirements = {},
 	Callback = function(self, context, args)
 		local action = args[1]
-		
+
 		local hintType
 		for _, input in {"add", "remove", "list"} do
 			input = input:lower()
@@ -2580,11 +2597,11 @@ Executor.new({ -- Waypoint
 				end
 			end				
 		end
-		
+
 		local PlaceId = tostring(game.PlaceId)
 		local Character = User.Character
 		local Root = Character and Character:FindFirstChild("HumanoidRootPart")
-		
+
 		if action == "add" then
 			local name = args[2]
 			local exists, coords = Dbzfs.findWaypoint(name, Settings)
@@ -2595,14 +2612,14 @@ Executor.new({ -- Waypoint
 				end
 				return {action, name}
 			end
-			
+
 			if exists then return `Waypoint already exists.`, false end
 			if not Root then return `Unable to save waypoint.`, false end
 			local Coords = tostring(Root.Position)
 			local Create = {Name = name, Coords = Coords}
-			
+
 			table.insert(Settings.Waypoints[PlaceId], Create)
-			
+
 			local Status = writeSave()
 			if Status then
 				return `Created waypoint: {name}`, true
@@ -2682,11 +2699,11 @@ Executor.new({ -- Follow
 					inputType = input
 				end				
 			end
-			
+
 			if not inputType then
 				return {}, {`invalid input`}, {[2] = true, [3] = true}
 			end
-			
+
 			if inputType == "on" then
 				local t = "true"
 				if not rawName then return {inputType} end
@@ -2696,31 +2713,31 @@ Executor.new({ -- Follow
 				elseif doBean and t:sub(1, #doBean) ~= string.lower(doBean) then
 					return {inputType, target.Name}, {`invalid input`}
 				end
-				
+
 				return {inputType, target.Name}
 			else
 				return {inputType}, {}, {[2] = true, [3] = true}
 			end
-			
+
 		elseif context == "run" then
-			
+
 			if action == "on" then
 				if not target then return `No target found`, false end
 				if self.Active then return `Follow is already on.`, true end
-			
+
 				if doBean then
 					if doBean ~= "true" then return `Invalid input.`, false end
 					doBean = true
 				else
 					doBean = false
 				end
-				
+
 				local myRoot = Helper.getRoot(User.Character)
 				local targetRoot = target and Helper.getRoot(target)
 				if not myRoot or not targetRoot then return "Unable to teleport.", false end
-				
+
 				self.Active = true
-				
+
 				local Remotes = Dbzfs.getRemotes()
 				local Start = tick()
 				local Loop = Service.RunService.RenderStepped:Connect(function()
@@ -2731,9 +2748,9 @@ Executor.new({ -- Follow
 						Remotes.EatSenzu:FireServer(' ');
 					end
 				end)
-				
+
 				local _ = self.Connect(Loop)
-				
+
 				return `Following target: {target.Name}`, true
 			elseif action == "off" then
 				if not self.Active then return `Follow is already off.`, true end
@@ -2755,7 +2772,7 @@ Executor.new({ -- World
 	Callback = function(self, context, args)
 		local name = args[1]
 		local worlds = Dbzfs.getWorlds()
-		
+
 		local world
 		local id
 		for placeName, placeId in worlds do
@@ -2764,7 +2781,7 @@ Executor.new({ -- World
 				id = placeId
 			end
 		end
-		
+
 		if context == "hint" then
 			if world then return {world} end
 			return {}, {`no world found.`}
@@ -2794,11 +2811,11 @@ Executor.new({ -- Teleport
 		local isMob = rawName:sub(1, 1) == "@"
 		local searchName = isMob and rawName:sub(2):gsub("_", " "):lower() or rawName:gsub("_", " "):lower()
 		local index = tonumber(args[2] or 1)
-		
+
 		local _
 		local target
 		local amount = 0
-		
+
 		if isMob then
 			target, amount = Helper.findMob(searchName, index)
 		else
@@ -2809,7 +2826,7 @@ Executor.new({ -- Teleport
 		if context == "hint" then
 			if not target then return {}, {} end
 			local displayName = target.Name:gsub(" ", "_")
-			
+
 			if isMob then
 				local txt = (amount > 1 and `{amount}` or 1)
 				return {`@{displayName}`, `{txt}`}, {}
@@ -2817,7 +2834,7 @@ Executor.new({ -- Teleport
 				return {`{displayName}`}, {}, {[2] = true}
 			end
 		elseif context == "run" then
-			
+
 			if not target then
 				local Instant = User.Backpack:FindFirstChild("Instant Transmission")
 				if not Instant then return `You do not own Instant Transmission.`, false end
@@ -2829,7 +2846,7 @@ Executor.new({ -- Teleport
 				Instant.Parent = User.Backpack
 				return `Attempting to use Instant Transmission...`, true
 			end
-			
+
 			local myRoot = Helper.getRoot(User.Character)
 			local targetRoot = target and Helper.getRoot(target)
 			if not myRoot or not targetRoot then return "Unable to teleport.", false end
@@ -2846,41 +2863,41 @@ Executor.new({ -- Slot
 	Requirements = {},
 	Callback = function(self, context, args)
 		local Slot = args[1] and tonumber(args[1])
-		
+
 		if context == "hint" then
 			if not Slot or Slot < 1 or Slot > 3 then
 				return {}, {`invalid input`}
 			end
 			return {Slot}
 		end
-		
+
 		if not Slot then
 			return `Provide slot number to change.`, false
 		elseif Slot and Slot > 3 then
 			return `Unable to switch to slot: {Slot}.`, false
 		end
-		
+
 		local Position = 1
 		local Baba = workspace.FriendlyNPCs["Character Slot Changer"]
-		
+
 		local Character = User.Character
 		local Root = Character and Character:FindFirstChild("HumanoidRootPart")
 		local CF = Root and Root.CFrame
 		if not Root then return `Unable to change slots.`, false end
-			
+
 		local ChatGui = Dbzfs.getChat()
 		local Remotes = Dbzfs.getRemotes()
-		
+
 		local Label = ChatGui.TextLabel
 		local Start = Remotes.Start
 		local Advance = Remotes.Advance
-		
+
 		local Lines = {
 			[1] = "Change Character Slots?",
 			[2] = "Alright",
 			[3] = "Which slot would you like to play in?",
 		}
-		
+
 		local Options = {
 			[1] = {
 				[1] = "Yes"
@@ -2894,17 +2911,17 @@ Executor.new({ -- Slot
 				[3] = "Slot3"
 			}
 		}
-		
+
 		repeat
 			Start:FireServer(Baba)
 			task.wait()
 		until ChatGui.Visible
-		
+
 		while true do
 			if not ChatGui then break end
-			
+
 			local Text = Label.Text
-			
+
 			if Position == 3 then
 				if Text == "Loading!" then
 					break
@@ -2917,17 +2934,17 @@ Executor.new({ -- Slot
 					Position += 1
 				end
 			end
-			
+
 			task.wait()
 		end
-		
+
 		User.CharacterRemoving:Once(function()
 			local Character = User.CharacterAdded:Wait()
 			local Root = Character:WaitForChild("HumanoidRootPart", 3)
 			if not Root then return end
 			repeat Root.CFrame = CF task.wait() until Character:FindFirstChild("True")
 		end)
-		
+
 		return `Prompting slot changer.`, true
 	end,
 })
@@ -2958,7 +2975,7 @@ Executor.new({ -- Autofarm
 			local Remotes = Dbzfs.getRemotes()
 			local Names = {}
 			local List = {}
-			
+
 			local function refreshList(Mob, Skip)
 				task.spawn(function()
 					if Service.Players:GetPlayerFromCharacter(Mob) then return end
@@ -2977,7 +2994,7 @@ Executor.new({ -- Autofarm
 					end
 				end)
 			end
-			
+
 			if toggle == "on" then
 				if self.Active then
 					return `Autofarm is already on.`, true
@@ -2990,7 +3007,7 @@ Executor.new({ -- Autofarm
 				self.Block.CanCollide = true
 				self.Block.Anchored = true
 				self.Block.Parent = workspace
-				
+
 				for _, name in mobs do
 					local n = name:gsub("_", " ")
 					table.insert(Names, n)
@@ -3000,11 +3017,11 @@ Executor.new({ -- Autofarm
 					self.Active = false
 					return `Please specify mob names.`, false
 				end
-				
+
 				for _, mob in workspace.Live:GetChildren() do
 					refreshList(mob, true)
 				end
-				
+
 				table.sort(List, function(a, b)
 					return a.Name:lower() < b.Name:lower()
 				end)
@@ -3017,7 +3034,7 @@ Executor.new({ -- Autofarm
 					local Character = User.Character
 					local MyRoot = User.Character and Helper.getRoot(User.Character)
 					if not (Character or MyRoot) then return end
-					
+
 					self.Block.CFrame = MyRoot.CFrame * CFrame.new(0, -3.5, 0)
 
 					local Victim = List[1]
@@ -3147,7 +3164,7 @@ Executor.new({ -- Reset
 			if not Character or not Root then 
 				return `Unable to reset at the moment.`, false
 			end
-			
+
 			local input = args[1]
 			if input and input == "true" then
 				task.spawn(function()
@@ -3156,7 +3173,7 @@ Executor.new({ -- Reset
 					repeat Root.CFrame = CF; task.wait() until Character:FindFirstChild("True")
 				end)
 			end
-			
+
 			Character:BreakJoints()
 			return `Resetting character.`, true
 		end
