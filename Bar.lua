@@ -1,5 +1,5 @@
-local BAR_VERSION = "1.1.5"
-local BAR_TIME = "5/9/2025 10:16 HST"
+local BAR_VERSION = "1.1.6"
+local BAR_TIME = "5/9/2025 11:33 HST"
 
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
@@ -1663,6 +1663,7 @@ Executor.new({ -- Sense
 		if context == "hint" then return end
 		if self.Active then return `Sense is already enabled.`, false end
 		self.Active = true
+		self.Show = false
 		
 		local All = {}
 		
@@ -1720,20 +1721,31 @@ Executor.new({ -- Sense
 		
 		local function newSense(target: Model)
 			
-			local Head = target:WaitForChild("Head", 5)
-			if not Head then return end
+			local tName = target and target.Name
+			if not tName then return end
+			
+			local Humanoid: Humanoid = target:WaitForChild("Humanoid")
+			local Head = target:WaitForChild("Head")
+			if not Head or not Humanoid then return end
 			if Head:FindFirstChild("Sense") then Head.Sense:Destroy() end
 			
 			local Race
 			local Level
+			local Namae
 			local isPlayer = Service.Players:GetPlayerFromCharacter(target)
 			
 			if isPlayer then
+				if isPlayer.UserId == User.UserId then return end
 				Race = target:WaitForChild("Race")
-				Level = target:FindFirstChildWhichIsA("Model")
+				repeat
+					local T = target:FindFirstChildWhichIsA("Model")
+					if T and T:FindFirstChild("ZZXX") then
+						Level = T
+					end
+					task.wait()
+				until Level ~= nil
+				Namae = Level.Name
 			end
-			
-			if isPlayer and isPlayer.UserId == User.UserId or not Race or not Level then return end
 			
 			local SenseUI = {
 				["_Sense"] = Instance.new("BillboardGui");
@@ -1765,12 +1777,15 @@ Executor.new({ -- Sense
 				["_Overall"] = Instance.new("Frame");
 				["_Title8"] = Instance.new("TextLabel");
 				["_Val7"] = Instance.new("TextLabel");
-				["_Overlap"] = Instance.new("Frame");
+				["_Rebirth"] = Instance.new("Frame");
+				["_UIGradient"] = Instance.new("UIGradient");
 				["_UICorner"] = Instance.new("UICorner");
+				["_Health"] = Instance.new("Frame");
+				["_Overlap"] = Instance.new("Frame");
 			}
 
 			do
-				SenseUI["_Sense"].Enabled = false
+				SenseUI["_Sense"].Enabled = self.Show
 				SenseUI["_Sense"].MaxDistance = (isPlayer and math.huge) or 50
 				SenseUI["_Sense"].Active = true
 				SenseUI["_Sense"].Adornee = Head
@@ -1778,7 +1793,8 @@ Executor.new({ -- Sense
 				SenseUI["_Sense"].ClipsDescendants = true
 				SenseUI["_Sense"].LightInfluence = 1
 				SenseUI["_Sense"].Size = UDim2.new(3, 300, 1, 100)
-				SenseUI["_Sense"].StudsOffset = Vector3.new(0, 4.5, 0)
+				SenseUI["_Sense"].StudsOffset = Vector3.new(0, 3.5, 0)
+				SenseUI["_Sense"].SizeOffset = Vector2.new(0, 0.5)
 				SenseUI["_Sense"].ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 				SenseUI["_Sense"].Name = "Sense"
 				SenseUI["_Sense"].Parent = Head
@@ -1792,7 +1808,7 @@ Executor.new({ -- Sense
 				SenseUI["_Main"].Parent = SenseUI["_Sense"]
 
 				SenseUI["_Title"].Font = Enum.Font.SourceSansBold
-				SenseUI["_Title"].Text = ""
+				SenseUI["_Title"].Text = "[Lvl. 2000] Sucuretto"
 				SenseUI["_Title"].TextColor3 = Color3.fromRGB(255, 255, 0)
 				SenseUI["_Title"].TextScaled = true
 				SenseUI["_Title"].TextSize = 14
@@ -1834,7 +1850,7 @@ Executor.new({ -- Sense
 				SenseUI["_Health-Max"].BorderSizePixel = 0
 				SenseUI["_Health-Max"].LayoutOrder = 1
 				SenseUI["_Health-Max"].Size = UDim2.new(0, 100, 0, 100)
-				SenseUI["_Health-Max"].Name = "Health Max"
+				SenseUI["_Health-Max"].Name = "Health-Max"
 				SenseUI["_Health-Max"].Parent = SenseUI["_Stats"]
 
 				SenseUI["_Title1"].Font = Enum.Font.SourceSansBold
@@ -1876,7 +1892,7 @@ Executor.new({ -- Sense
 				SenseUI["_Ki-Max"].BorderSizePixel = 0
 				SenseUI["_Ki-Max"].LayoutOrder = 2
 				SenseUI["_Ki-Max"].Size = UDim2.new(0, 100, 0, 100)
-				SenseUI["_Ki-Max"].Name = "Ki Max"
+				SenseUI["_Ki-Max"].Name = "Ki-Max"
 				SenseUI["_Ki-Max"].Parent = SenseUI["_Stats"]
 
 				SenseUI["_Title2"].Font = Enum.Font.SourceSansBold
@@ -1918,7 +1934,7 @@ Executor.new({ -- Sense
 				SenseUI["_Phys-Damage"].BorderSizePixel = 0
 				SenseUI["_Phys-Damage"].LayoutOrder = 3
 				SenseUI["_Phys-Damage"].Size = UDim2.new(0, 100, 0, 100)
-				SenseUI["_Phys-Damage"].Name = "Physical Strength"
+				SenseUI["_Phys-Damage"].Name = "Phys-Damage"
 				SenseUI["_Phys-Damage"].Parent = SenseUI["_Stats"]
 
 				SenseUI["_Title3"].Font = Enum.Font.SourceSansBold
@@ -1960,7 +1976,7 @@ Executor.new({ -- Sense
 				SenseUI["_Ki-Damage"].BorderSizePixel = 0
 				SenseUI["_Ki-Damage"].LayoutOrder = 4
 				SenseUI["_Ki-Damage"].Size = UDim2.new(0, 100, 0, 100)
-				SenseUI["_Ki-Damage"].Name = "Ki Strength"
+				SenseUI["_Ki-Damage"].Name = "Ki-Damage"
 				SenseUI["_Ki-Damage"].Parent = SenseUI["_Stats"]
 
 				SenseUI["_Title4"].Font = Enum.Font.SourceSansBold
@@ -2002,7 +2018,7 @@ Executor.new({ -- Sense
 				SenseUI["_Phys-Resist"].BorderSizePixel = 0
 				SenseUI["_Phys-Resist"].LayoutOrder = 5
 				SenseUI["_Phys-Resist"].Size = UDim2.new(0, 100, 0, 100)
-				SenseUI["_Phys-Resist"].Name = "Physical Resistance"
+				SenseUI["_Phys-Resist"].Name = "Phys-Resist"
 				SenseUI["_Phys-Resist"].Parent = SenseUI["_Stats"]
 
 				SenseUI["_Title5"].Font = Enum.Font.SourceSansBold
@@ -2044,7 +2060,7 @@ Executor.new({ -- Sense
 				SenseUI["_Ki-Resist"].BorderSizePixel = 0
 				SenseUI["_Ki-Resist"].LayoutOrder = 6
 				SenseUI["_Ki-Resist"].Size = UDim2.new(0, 100, 0, 100)
-				SenseUI["_Ki-Resist"].Name = "Ki Resistance"
+				SenseUI["_Ki-Resist"].Name = "Ki-Resist"
 				SenseUI["_Ki-Resist"].Parent = SenseUI["_Stats"]
 
 				SenseUI["_Title6"].Font = Enum.Font.SourceSansBold
@@ -2164,18 +2180,45 @@ Executor.new({ -- Sense
 				SenseUI["_Val7"].Name = "Val"
 				SenseUI["_Val7"].Parent = SenseUI["_Overall"]
 
-				SenseUI["_Overlap"].BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-				SenseUI["_Overlap"].BackgroundTransparency = 0.5
-				SenseUI["_Overlap"].BorderColor3 = Color3.fromRGB(0, 0, 0)
-				SenseUI["_Overlap"].BorderSizePixel = 0
-				SenseUI["_Overlap"].Position = UDim2.new(0, 0, 0.325218081, 0)
-				SenseUI["_Overlap"].Size = UDim2.new(1, 0, 0.670270264, 0)
-				SenseUI["_Overlap"].ZIndex = 0
-				SenseUI["_Overlap"].Name = "Overlap"
-				SenseUI["_Overlap"].Parent = SenseUI["_Main"]
+				SenseUI["_Rebirth"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Rebirth"].BackgroundTransparency = 0.5
+				SenseUI["_Rebirth"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Rebirth"].BorderSizePixel = 0
+				SenseUI["_Rebirth"].Position = UDim2.new(0, 0, 0.325218081, 0)
+				SenseUI["_Rebirth"].Size = UDim2.new(1, 0, 0.699999988, 0)
+				SenseUI["_Rebirth"].Visible = false
+				SenseUI["_Rebirth"].ZIndex = 0
+				SenseUI["_Rebirth"].Name = "Rebirth"
+				SenseUI["_Rebirth"].Parent = SenseUI["_Main"]
+
+				SenseUI["_UIGradient"].Color = ColorSequence.new{
+					ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
+					ColorSequenceKeypoint.new(1, Color3.fromRGB(90, 90, 90))
+				}
+				SenseUI["_UIGradient"].Rotation = 90
+				SenseUI["_UIGradient"].Parent = SenseUI["_Rebirth"]
 
 				SenseUI["_UICorner"].CornerRadius = UDim.new(0.0250000004, 0)
 				SenseUI["_UICorner"].Parent = SenseUI["_Main"]
+
+				SenseUI["_Health"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Health"].BackgroundTransparency = 0.8
+				SenseUI["_Health"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Health"].BorderSizePixel = 0
+				SenseUI["_Health"].Size = UDim2.new(0.999514759, 0, 0.319344938, 0)
+				SenseUI["_Health"].Name = "Health"
+				SenseUI["_Health"].Parent = SenseUI["_Main"]
+
+				SenseUI["_Overlap"].BackgroundColor3 = Color3.fromRGB(26.00000225007534, 26.00000225007534, 26.00000225007534)
+				SenseUI["_Overlap"].BackgroundTransparency = 0.5
+				SenseUI["_Overlap"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Overlap"].BorderSizePixel = 0
+				SenseUI["_Overlap"].Interactable = false
+				SenseUI["_Overlap"].Position = UDim2.new(0, 0, 0.325218081, 0)
+				SenseUI["_Overlap"].Size = UDim2.new(1, 0, 0.699999988, 0)
+				SenseUI["_Overlap"].ZIndex = 0
+				SenseUI["_Overlap"].Name = "Overlap"
+				SenseUI["_Overlap"].Parent = SenseUI["_Main"]
 
 			end
 			
@@ -2211,6 +2254,8 @@ Executor.new({ -- Sense
 				for i, v in AllStats do
 					local stat = SenseUI[`_{i}`]
 					if not stat then continue end
+					local val = stat:WaitForChild("Val", 3)
+					if not val then continue end
 					stat.Val.Text = formatNumberWithCommas(v)
 					stat.Val.TextColor3 = getTweenedColor(v)
 					Total += v
@@ -2218,10 +2263,14 @@ Executor.new({ -- Sense
 				
 				local fullText
 				if isPlayer then
-					SenseUI._Title.Text = `[{formatName(Level.Name)}] {target.Name}`
+					if target:FindFirstChild("RebirthWings") then
+						SenseUI._Overlap.Visible = false
+						SenseUI._Rebirth.Visible = true
+					end
+					SenseUI._Title.Text = `[{formatName(Namae)}] {tName}`
 					SenseUI._Title.TextColor3 = Colors[Race.Value]
 				else
-					SenseUI._Title.Text = target.Name
+					SenseUI._Title.Text = tName
 				end
 			end
 			
@@ -2237,6 +2286,12 @@ Executor.new({ -- Sense
 				folder.ChildAdded:Connect(updateSense)
 				folder.ChildRemoved:Connect(updateSense)
 			end
+			
+			Humanoid.HealthChanged:Connect(function()
+				local MAX = Humanoid.MaxHealth
+				local HP = Humanoid.Health
+				SenseUI._Health.Size = UDim2.new(HP/MAX, 0, 0.319344938, 0)
+			end)
 			
 			folderAdded(OG)
 			folderAdded(Boosts)
@@ -2268,7 +2323,7 @@ Executor.new({ -- Sense
 			end
 		end)
 		
-		self.Show = false
+		
 		Service.ContextActionService:BindAction("Sense", function(action, state, object)
 			if action == "Sense" and state == Enum.UserInputState.End then
 				self.Show = not self.Show
@@ -3853,7 +3908,7 @@ Executor.new({ -- Reset
 	end,
 })
 
-Executor.new({
+Executor.new({ -- Version
 	Name = "Version",
 	Description = "Shows version.",
 	Parameters = {},
