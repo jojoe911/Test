@@ -1,5 +1,5 @@
-local BAR_VERSION = "1.1.1"
-local BAR_TIME = "5/5/2025 01:24 HST"
+local BAR_VERSION = "1.1.5"
+local BAR_TIME = "5/9/2025 10:16 HST"
 
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
@@ -1609,6 +1609,679 @@ function Executor.cleanUp()
 	end
 end
 
+Executor.new({ -- Server Hop
+	Name = "Shop",
+	Description = "Server hop to the lowest server.",
+	Parameters = {},
+	Requirements = {},
+	Callback = function(self, context)
+		if context == "hint" then return end
+		local i = {}
+
+		local Success, Failed = pcall(function()
+			for l, v in next, game.HttpService:JSONDecode(game:HttpGet(("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=%d"):format(game.PlaceId, 100))).data, nil do
+				if (type(v) == "table" and v.maxPlayers > v.playing and v.id ~= game.JobId) then
+					i[#i + 1] = {
+						amount = tonumber(v.playing), 
+						id = v.id
+					}
+				end
+			end
+		end)
+		
+		if not Success then return `Unable to server hop at the moment.` end
+		
+		table.sort(i, function(a, b)
+			return a.amount < b.amount
+		end)
+
+		if (i[1]) then
+			game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, i[1].id)
+		end
+		return `Attempting to server hop. Please wait.`, true
+	end,
+})
+
+Executor.new({ -- IF_YE
+	Name = "IFYE",
+	Description = "Opens infinite yield.",
+	Parameters = {},
+	Requirements = {},
+	Callback = function(self, context)
+		if context == "hint" then return end
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+		return `Opening Infinite Yield.`, true
+	end,
+})
+
+Executor.new({ -- Sense
+	Name = "Sense",
+	Description = "Better Ki sense.",
+	Parameters = {},
+	Requirements = {},
+	Callback = function(self, context)
+		if context == "hint" then return end
+		if self.Active then return `Sense is already enabled.`, false end
+		self.Active = true
+		
+		local All = {}
+		
+		local Colors = {
+			Saiyan = Color3.fromRGB(252, 255, 87),
+			Namekian = Color3.fromRGB(100, 255, 89),
+			Jiren = Color3.fromRGB(255, 35, 35),
+			Human = Color3.fromRGB(255, 255, 255),
+			Frieza = Color3.fromRGB(190, 79, 255),
+			Android = Color3.fromRGB(48, 245, 255),
+			Majin = Color3.fromRGB(255, 181, 182)
+		}
+		
+		local function lerp(a, b, t)
+			return a + (b - a) * t
+		end
+
+		local function getTweenedColor(number)
+			local clamped = math.clamp(number, 0, 1_000_000)
+			local t = (clamped - 1) / (1_000_000 - 1)
+			local r = 255
+			local g = lerp(255, 0, t)
+			local b = lerp(255, 0, t)
+
+			return Color3.fromRGB(r, math.floor(g), math.floor(b))
+		end
+		
+		local function formatName(name)
+			local modified = string.gsub(name, "Prestige:%s*(%d+)", "Pre. %1")
+			modified = string.gsub(modified, "[\r\n]", " ")
+			modified = string.gsub(modified, "%s+", " ")
+			modified = string.gsub(modified, "(Pre%. %d+)%s+(Lvl%. %d+)", "%1 | %2")
+
+			return modified
+		end
+		
+		local function getStats(target, og, boosts)
+			local T = {
+				Overall = 0
+			}
+			
+			if og and boosts then
+				for i, v in og:GetChildren() do
+					if not T[v.Name] then
+						T[v.Name] = 0
+					end
+					
+					T[v.Name] = T[v.Name] + v.Value
+					T.Overall += v.Value
+				end
+			end
+				
+			return T
+		end
+		
+		local function newSense(target: Model)
+			
+			local Head = target:WaitForChild("Head", 5)
+			if not Head then return end
+			if Head:FindFirstChild("Sense") then Head.Sense:Destroy() end
+			
+			local Race
+			local Level
+			local isPlayer = Service.Players:GetPlayerFromCharacter(target)
+			
+			if isPlayer then
+				Race = target:WaitForChild("Race")
+				Level = target:FindFirstChildWhichIsA("Model")
+			end
+			
+			if isPlayer and isPlayer.UserId == User.UserId or not Race or not Level then return end
+			
+			local SenseUI = {
+				["_Sense"] = Instance.new("BillboardGui");
+				["_Main"] = Instance.new("CanvasGroup");
+				["_Title"] = Instance.new("TextLabel");
+				["_Stats"] = Instance.new("Frame");
+				["_UIGridLayout"] = Instance.new("UIGridLayout");
+				["_Health-Max"] = Instance.new("Frame");
+				["_Title1"] = Instance.new("TextLabel");
+				["_Val"] = Instance.new("TextLabel");
+				["_Ki-Max"] = Instance.new("Frame");
+				["_Title2"] = Instance.new("TextLabel");
+				["_Val1"] = Instance.new("TextLabel");
+				["_Phys-Damage"] = Instance.new("Frame");
+				["_Title3"] = Instance.new("TextLabel");
+				["_Val2"] = Instance.new("TextLabel");
+				["_Ki-Damage"] = Instance.new("Frame");
+				["_Title4"] = Instance.new("TextLabel");
+				["_Val3"] = Instance.new("TextLabel");
+				["_Phys-Resist"] = Instance.new("Frame");
+				["_Title5"] = Instance.new("TextLabel");
+				["_Val4"] = Instance.new("TextLabel");
+				["_Ki-Resist"] = Instance.new("Frame");
+				["_Title6"] = Instance.new("TextLabel");
+				["_Val5"] = Instance.new("TextLabel");
+				["_Speed"] = Instance.new("Frame");
+				["_Title7"] = Instance.new("TextLabel");
+				["_Val6"] = Instance.new("TextLabel");
+				["_Overall"] = Instance.new("Frame");
+				["_Title8"] = Instance.new("TextLabel");
+				["_Val7"] = Instance.new("TextLabel");
+				["_Overlap"] = Instance.new("Frame");
+				["_UICorner"] = Instance.new("UICorner");
+			}
+
+			do
+				SenseUI["_Sense"].Enabled = false
+				SenseUI["_Sense"].MaxDistance = (isPlayer and math.huge) or 50
+				SenseUI["_Sense"].Active = true
+				SenseUI["_Sense"].Adornee = Head
+				SenseUI["_Sense"].AlwaysOnTop = true
+				SenseUI["_Sense"].ClipsDescendants = true
+				SenseUI["_Sense"].LightInfluence = 1
+				SenseUI["_Sense"].Size = UDim2.new(3, 300, 1, 100)
+				SenseUI["_Sense"].StudsOffset = Vector3.new(0, 4.5, 0)
+				SenseUI["_Sense"].ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+				SenseUI["_Sense"].Name = "Sense"
+				SenseUI["_Sense"].Parent = Head
+
+				SenseUI["_Main"].BackgroundColor3 = Color3.fromRGB(20.000000707805157, 20.000000707805157, 20.000000707805157)
+				SenseUI["_Main"].BackgroundTransparency = 0.5
+				SenseUI["_Main"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Main"].BorderSizePixel = 0
+				SenseUI["_Main"].Size = UDim2.new(1, 0, 1, 0)
+				SenseUI["_Main"].Name = "Main"
+				SenseUI["_Main"].Parent = SenseUI["_Sense"]
+
+				SenseUI["_Title"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Title"].Text = ""
+				SenseUI["_Title"].TextColor3 = Color3.fromRGB(255, 255, 0)
+				SenseUI["_Title"].TextScaled = true
+				SenseUI["_Title"].TextSize = 14
+				SenseUI["_Title"].TextStrokeTransparency = 0
+				SenseUI["_Title"].TextWrapped = true
+				SenseUI["_Title"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Title"].AnchorPoint = Vector2.new(0.5, 0.5)
+				SenseUI["_Title"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Title"].BackgroundTransparency = 1
+				SenseUI["_Title"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Title"].BorderSizePixel = 0
+				SenseUI["_Title"].Position = UDim2.new(0.499999911, 0, 0.165000007, 0)
+				SenseUI["_Title"].Size = UDim2.new(0.951949596, 0, 0.230165675, 0)
+				SenseUI["_Title"].ZIndex = 2
+				SenseUI["_Title"].Name = "Title"
+				SenseUI["_Title"].Parent = SenseUI["_Main"]
+
+				SenseUI["_Stats"].AnchorPoint = Vector2.new(0.5, 0.5)
+				SenseUI["_Stats"].BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Stats"].BackgroundTransparency = 1
+				SenseUI["_Stats"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Stats"].BorderSizePixel = 0
+				SenseUI["_Stats"].Position = UDim2.new(0.500724852, 0, 0.664633155, 0)
+				SenseUI["_Stats"].Size = UDim2.new(0.950499713, 0, 0.524948657, 0)
+				SenseUI["_Stats"].Name = "Stats"
+				SenseUI["_Stats"].Parent = SenseUI["_Main"]
+
+				SenseUI["_UIGridLayout"].CellPadding = UDim2.new(0, 0, 0.100000001, 0)
+				SenseUI["_UIGridLayout"].CellSize = UDim2.new(0.25, 0, 0.485000014, 0)
+				SenseUI["_UIGridLayout"].FillDirectionMaxCells = 4
+				SenseUI["_UIGridLayout"].HorizontalAlignment = Enum.HorizontalAlignment.Center
+				SenseUI["_UIGridLayout"].SortOrder = Enum.SortOrder.LayoutOrder
+				SenseUI["_UIGridLayout"].VerticalAlignment = Enum.VerticalAlignment.Center
+				SenseUI["_UIGridLayout"].Parent = SenseUI["_Stats"]
+
+				SenseUI["_Health-Max"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Health-Max"].BackgroundTransparency = 1
+				SenseUI["_Health-Max"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Health-Max"].BorderSizePixel = 0
+				SenseUI["_Health-Max"].LayoutOrder = 1
+				SenseUI["_Health-Max"].Size = UDim2.new(0, 100, 0, 100)
+				SenseUI["_Health-Max"].Name = "Health Max"
+				SenseUI["_Health-Max"].Parent = SenseUI["_Stats"]
+
+				SenseUI["_Title1"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Title1"].Text = "Health Max:"
+				SenseUI["_Title1"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Title1"].TextScaled = true
+				SenseUI["_Title1"].TextSize = 23
+				SenseUI["_Title1"].TextWrapped = true
+				SenseUI["_Title1"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Title1"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Title1"].BackgroundTransparency = 1
+				SenseUI["_Title1"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Title1"].BorderSizePixel = 0
+				SenseUI["_Title1"].LayoutOrder = 1
+				SenseUI["_Title1"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Title1"].Name = "Title"
+				SenseUI["_Title1"].Parent = SenseUI["_Health-Max"]
+
+				SenseUI["_Val"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Val"].Text = "999,999,999"
+				SenseUI["_Val"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Val"].TextScaled = true
+				SenseUI["_Val"].TextSize = 23
+				SenseUI["_Val"].TextWrapped = true
+				SenseUI["_Val"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Val"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Val"].BackgroundTransparency = 1
+				SenseUI["_Val"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Val"].BorderSizePixel = 0
+				SenseUI["_Val"].LayoutOrder = 1
+				SenseUI["_Val"].Position = UDim2.new(0, 0, 0.5, 0)
+				SenseUI["_Val"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Val"].Name = "Val"
+				SenseUI["_Val"].Parent = SenseUI["_Health-Max"]
+
+				SenseUI["_Ki-Max"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Ki-Max"].BackgroundTransparency = 1
+				SenseUI["_Ki-Max"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Ki-Max"].BorderSizePixel = 0
+				SenseUI["_Ki-Max"].LayoutOrder = 2
+				SenseUI["_Ki-Max"].Size = UDim2.new(0, 100, 0, 100)
+				SenseUI["_Ki-Max"].Name = "Ki Max"
+				SenseUI["_Ki-Max"].Parent = SenseUI["_Stats"]
+
+				SenseUI["_Title2"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Title2"].Text = "Ki Max:"
+				SenseUI["_Title2"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Title2"].TextScaled = true
+				SenseUI["_Title2"].TextSize = 23
+				SenseUI["_Title2"].TextWrapped = true
+				SenseUI["_Title2"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Title2"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Title2"].BackgroundTransparency = 1
+				SenseUI["_Title2"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Title2"].BorderSizePixel = 0
+				SenseUI["_Title2"].LayoutOrder = 1
+				SenseUI["_Title2"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Title2"].Name = "Title"
+				SenseUI["_Title2"].Parent = SenseUI["_Ki-Max"]
+
+				SenseUI["_Val1"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Val1"].Text = "999,999,999"
+				SenseUI["_Val1"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Val1"].TextScaled = true
+				SenseUI["_Val1"].TextSize = 23
+				SenseUI["_Val1"].TextWrapped = true
+				SenseUI["_Val1"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Val1"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Val1"].BackgroundTransparency = 1
+				SenseUI["_Val1"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Val1"].BorderSizePixel = 0
+				SenseUI["_Val1"].LayoutOrder = 1
+				SenseUI["_Val1"].Position = UDim2.new(0, 0, 0.5, 0)
+				SenseUI["_Val1"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Val1"].Name = "Val"
+				SenseUI["_Val1"].Parent = SenseUI["_Ki-Max"]
+
+				SenseUI["_Phys-Damage"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Phys-Damage"].BackgroundTransparency = 1
+				SenseUI["_Phys-Damage"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Phys-Damage"].BorderSizePixel = 0
+				SenseUI["_Phys-Damage"].LayoutOrder = 3
+				SenseUI["_Phys-Damage"].Size = UDim2.new(0, 100, 0, 100)
+				SenseUI["_Phys-Damage"].Name = "Physical Strength"
+				SenseUI["_Phys-Damage"].Parent = SenseUI["_Stats"]
+
+				SenseUI["_Title3"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Title3"].Text = "Melee Dmg:"
+				SenseUI["_Title3"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Title3"].TextScaled = true
+				SenseUI["_Title3"].TextSize = 23
+				SenseUI["_Title3"].TextWrapped = true
+				SenseUI["_Title3"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Title3"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Title3"].BackgroundTransparency = 1
+				SenseUI["_Title3"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Title3"].BorderSizePixel = 0
+				SenseUI["_Title3"].LayoutOrder = 1
+				SenseUI["_Title3"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Title3"].Name = "Title"
+				SenseUI["_Title3"].Parent = SenseUI["_Phys-Damage"]
+
+				SenseUI["_Val2"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Val2"].Text = "999,999,999"
+				SenseUI["_Val2"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Val2"].TextScaled = true
+				SenseUI["_Val2"].TextSize = 23
+				SenseUI["_Val2"].TextWrapped = true
+				SenseUI["_Val2"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Val2"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Val2"].BackgroundTransparency = 1
+				SenseUI["_Val2"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Val2"].BorderSizePixel = 0
+				SenseUI["_Val2"].LayoutOrder = 1
+				SenseUI["_Val2"].Position = UDim2.new(0, 0, 0.5, 0)
+				SenseUI["_Val2"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Val2"].Name = "Val"
+				SenseUI["_Val2"].Parent = SenseUI["_Phys-Damage"]
+
+				SenseUI["_Ki-Damage"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Ki-Damage"].BackgroundTransparency = 1
+				SenseUI["_Ki-Damage"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Ki-Damage"].BorderSizePixel = 0
+				SenseUI["_Ki-Damage"].LayoutOrder = 4
+				SenseUI["_Ki-Damage"].Size = UDim2.new(0, 100, 0, 100)
+				SenseUI["_Ki-Damage"].Name = "Ki Strength"
+				SenseUI["_Ki-Damage"].Parent = SenseUI["_Stats"]
+
+				SenseUI["_Title4"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Title4"].Text = "Ki Dmg:"
+				SenseUI["_Title4"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Title4"].TextScaled = true
+				SenseUI["_Title4"].TextSize = 23
+				SenseUI["_Title4"].TextWrapped = true
+				SenseUI["_Title4"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Title4"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Title4"].BackgroundTransparency = 1
+				SenseUI["_Title4"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Title4"].BorderSizePixel = 0
+				SenseUI["_Title4"].LayoutOrder = 1
+				SenseUI["_Title4"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Title4"].Name = "Title"
+				SenseUI["_Title4"].Parent = SenseUI["_Ki-Damage"]
+
+				SenseUI["_Val3"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Val3"].Text = "999,999,999"
+				SenseUI["_Val3"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Val3"].TextScaled = true
+				SenseUI["_Val3"].TextSize = 23
+				SenseUI["_Val3"].TextWrapped = true
+				SenseUI["_Val3"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Val3"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Val3"].BackgroundTransparency = 1
+				SenseUI["_Val3"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Val3"].BorderSizePixel = 0
+				SenseUI["_Val3"].LayoutOrder = 1
+				SenseUI["_Val3"].Position = UDim2.new(0, 0, 0.5, 0)
+				SenseUI["_Val3"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Val3"].Name = "Val"
+				SenseUI["_Val3"].Parent = SenseUI["_Ki-Damage"]
+
+				SenseUI["_Phys-Resist"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Phys-Resist"].BackgroundTransparency = 1
+				SenseUI["_Phys-Resist"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Phys-Resist"].BorderSizePixel = 0
+				SenseUI["_Phys-Resist"].LayoutOrder = 5
+				SenseUI["_Phys-Resist"].Size = UDim2.new(0, 100, 0, 100)
+				SenseUI["_Phys-Resist"].Name = "Physical Resistance"
+				SenseUI["_Phys-Resist"].Parent = SenseUI["_Stats"]
+
+				SenseUI["_Title5"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Title5"].Text = "Melee Res:"
+				SenseUI["_Title5"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Title5"].TextScaled = true
+				SenseUI["_Title5"].TextSize = 23
+				SenseUI["_Title5"].TextWrapped = true
+				SenseUI["_Title5"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Title5"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Title5"].BackgroundTransparency = 1
+				SenseUI["_Title5"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Title5"].BorderSizePixel = 0
+				SenseUI["_Title5"].LayoutOrder = 1
+				SenseUI["_Title5"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Title5"].Name = "Title"
+				SenseUI["_Title5"].Parent = SenseUI["_Phys-Resist"]
+
+				SenseUI["_Val4"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Val4"].Text = "999,999,999"
+				SenseUI["_Val4"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Val4"].TextScaled = true
+				SenseUI["_Val4"].TextSize = 23
+				SenseUI["_Val4"].TextWrapped = true
+				SenseUI["_Val4"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Val4"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Val4"].BackgroundTransparency = 1
+				SenseUI["_Val4"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Val4"].BorderSizePixel = 0
+				SenseUI["_Val4"].LayoutOrder = 1
+				SenseUI["_Val4"].Position = UDim2.new(0, 0, 0.5, 0)
+				SenseUI["_Val4"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Val4"].Name = "Val"
+				SenseUI["_Val4"].Parent = SenseUI["_Phys-Resist"]
+
+				SenseUI["_Ki-Resist"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Ki-Resist"].BackgroundTransparency = 1
+				SenseUI["_Ki-Resist"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Ki-Resist"].BorderSizePixel = 0
+				SenseUI["_Ki-Resist"].LayoutOrder = 6
+				SenseUI["_Ki-Resist"].Size = UDim2.new(0, 100, 0, 100)
+				SenseUI["_Ki-Resist"].Name = "Ki Resistance"
+				SenseUI["_Ki-Resist"].Parent = SenseUI["_Stats"]
+
+				SenseUI["_Title6"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Title6"].Text = "Ki Res:"
+				SenseUI["_Title6"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Title6"].TextScaled = true
+				SenseUI["_Title6"].TextSize = 23
+				SenseUI["_Title6"].TextWrapped = true
+				SenseUI["_Title6"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Title6"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Title6"].BackgroundTransparency = 1
+				SenseUI["_Title6"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Title6"].BorderSizePixel = 0
+				SenseUI["_Title6"].LayoutOrder = 1
+				SenseUI["_Title6"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Title6"].Name = "Title"
+				SenseUI["_Title6"].Parent = SenseUI["_Ki-Resist"]
+
+				SenseUI["_Val5"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Val5"].Text = "999,999,999"
+				SenseUI["_Val5"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Val5"].TextScaled = true
+				SenseUI["_Val5"].TextSize = 23
+				SenseUI["_Val5"].TextWrapped = true
+				SenseUI["_Val5"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Val5"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Val5"].BackgroundTransparency = 1
+				SenseUI["_Val5"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Val5"].BorderSizePixel = 0
+				SenseUI["_Val5"].LayoutOrder = 1
+				SenseUI["_Val5"].Position = UDim2.new(0, 0, 0.5, 0)
+				SenseUI["_Val5"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Val5"].Name = "Val"
+				SenseUI["_Val5"].Parent = SenseUI["_Ki-Resist"]
+
+				SenseUI["_Speed"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Speed"].BackgroundTransparency = 1
+				SenseUI["_Speed"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Speed"].BorderSizePixel = 0
+				SenseUI["_Speed"].LayoutOrder = 7
+				SenseUI["_Speed"].Size = UDim2.new(0, 100, 0, 100)
+				SenseUI["_Speed"].Name = "Speed"
+				SenseUI["_Speed"].Parent = SenseUI["_Stats"]
+
+				SenseUI["_Title7"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Title7"].Text = "Speed:"
+				SenseUI["_Title7"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Title7"].TextScaled = true
+				SenseUI["_Title7"].TextSize = 23
+				SenseUI["_Title7"].TextWrapped = true
+				SenseUI["_Title7"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Title7"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Title7"].BackgroundTransparency = 1
+				SenseUI["_Title7"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Title7"].BorderSizePixel = 0
+				SenseUI["_Title7"].LayoutOrder = 1
+				SenseUI["_Title7"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Title7"].Name = "Title"
+				SenseUI["_Title7"].Parent = SenseUI["_Speed"]
+
+				SenseUI["_Val6"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Val6"].Text = "999,999,999"
+				SenseUI["_Val6"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Val6"].TextScaled = true
+				SenseUI["_Val6"].TextSize = 23
+				SenseUI["_Val6"].TextWrapped = true
+				SenseUI["_Val6"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Val6"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Val6"].BackgroundTransparency = 1
+				SenseUI["_Val6"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Val6"].BorderSizePixel = 0
+				SenseUI["_Val6"].LayoutOrder = 1
+				SenseUI["_Val6"].Position = UDim2.new(0, 0, 0.5, 0)
+				SenseUI["_Val6"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Val6"].Name = "Val"
+				SenseUI["_Val6"].Parent = SenseUI["_Speed"]
+
+				SenseUI["_Overall"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Overall"].BackgroundTransparency = 1
+				SenseUI["_Overall"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Overall"].BorderSizePixel = 0
+				SenseUI["_Overall"].LayoutOrder = 7
+				SenseUI["_Overall"].Size = UDim2.new(0, 100, 0, 100)
+				SenseUI["_Overall"].Name = "Overall"
+				SenseUI["_Overall"].Parent = SenseUI["_Stats"]
+
+				SenseUI["_Title8"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Title8"].Text = "Overall:"
+				SenseUI["_Title8"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Title8"].TextScaled = true
+				SenseUI["_Title8"].TextSize = 23
+				SenseUI["_Title8"].TextWrapped = true
+				SenseUI["_Title8"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Title8"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Title8"].BackgroundTransparency = 1
+				SenseUI["_Title8"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Title8"].BorderSizePixel = 0
+				SenseUI["_Title8"].LayoutOrder = 1
+				SenseUI["_Title8"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Title8"].Name = "Title"
+				SenseUI["_Title8"].Parent = SenseUI["_Overall"]
+
+				SenseUI["_Val7"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Val7"].Text = "999,999,999"
+				SenseUI["_Val7"].TextColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Val7"].TextScaled = true
+				SenseUI["_Val7"].TextSize = 23
+				SenseUI["_Val7"].TextWrapped = true
+				SenseUI["_Val7"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Val7"].BackgroundColor3 = Color3.fromRGB(255, 230.00001668930054, 166.00000530481339)
+				SenseUI["_Val7"].BackgroundTransparency = 1
+				SenseUI["_Val7"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Val7"].BorderSizePixel = 0
+				SenseUI["_Val7"].LayoutOrder = 1
+				SenseUI["_Val7"].Position = UDim2.new(0, 0, 0.5, 0)
+				SenseUI["_Val7"].Size = UDim2.new(1, 0, 0.5, 0)
+				SenseUI["_Val7"].Name = "Val"
+				SenseUI["_Val7"].Parent = SenseUI["_Overall"]
+
+				SenseUI["_Overlap"].BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Overlap"].BackgroundTransparency = 0.5
+				SenseUI["_Overlap"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Overlap"].BorderSizePixel = 0
+				SenseUI["_Overlap"].Position = UDim2.new(0, 0, 0.325218081, 0)
+				SenseUI["_Overlap"].Size = UDim2.new(1, 0, 0.670270264, 0)
+				SenseUI["_Overlap"].ZIndex = 0
+				SenseUI["_Overlap"].Name = "Overlap"
+				SenseUI["_Overlap"].Parent = SenseUI["_Main"]
+
+				SenseUI["_UICorner"].CornerRadius = UDim.new(0.0250000004, 0)
+				SenseUI["_UICorner"].Parent = SenseUI["_Main"]
+
+			end
+			
+			local OG = target:FindFirstChild("Stats")
+			local Boosts = target:FindFirstChild("Boosts")
+			
+			local Abbreviations = {
+				["Health-Max"] = "HP-MAX",
+				["Ki-Max"] = "KI-MAX",
+				["Phys-Damage"] = "PHYS-DMG",
+				["Ki-Damage"] = "KI-DMG",
+				["Phys-Resist"] = "PHYS-RES",
+				["Ki-Resist"] = "KI-RES",
+				["Speed"] = "SPD"
+			}
+			
+			local function formatNumberWithCommas(number)
+				local formatted = tostring(number)
+				local k
+				while true do
+					formatted, k = formatted:gsub("^(-?%d+)(%d%d%d)", "%1,%2")
+					if k == 0 then break end
+				end
+				return formatted
+			end
+			
+			local function updateSense()
+				local OG = target:FindFirstChild("Stats")
+				local Boosts = target:FindFirstChild("Boosts")
+				local AllStats = getStats(target, OG, Boosts)
+				local Total = 0
+			
+				for i, v in AllStats do
+					local stat = SenseUI[`_{i}`]
+					if not stat then continue end
+					stat.Val.Text = formatNumberWithCommas(v)
+					stat.Val.TextColor3 = getTweenedColor(v)
+					Total += v
+				end
+				
+				local fullText
+				if isPlayer then
+					SenseUI._Title.Text = `[{formatName(Level.Name)}] {target.Name}`
+					SenseUI._Title.TextColor3 = Colors[Race.Value]
+				else
+					SenseUI._Title.Text = target.Name
+				end
+			end
+			
+			local function valuesChanged(v)
+				v.Changed:Connect(updateSense)
+			end
+			
+			local function folderAdded(folder: Folder)
+				if not folder then return end
+				for _, s in folder:GetChildren() do
+					valuesChanged(s)
+				end
+				folder.ChildAdded:Connect(updateSense)
+				folder.ChildRemoved:Connect(updateSense)
+			end
+			
+			folderAdded(OG)
+			folderAdded(Boosts)
+			updateSense()
+			
+			table.insert(All, SenseUI._Sense)
+		end
+		
+		for _, v in workspace.Live:GetChildren() do
+			task.spawn(function()
+				newSense(v)
+			end)
+		end
+		
+		for _, v in workspace.Effects:GetChildren() do
+			if v.Name == "Senser" then v:Destroy() end
+		end
+		
+		workspace.Live.ChildAdded:Connect(function(child)
+			task.spawn(function()
+				newSense(child)
+			end)
+		end)
+		
+		local Loops
+		Loops = Service.RunService.RenderStepped:Connect(function()
+			for _, child in workspace.Effects:GetChildren() do
+				if child.Name == "Senser" then child:Destroy() end
+			end
+		end)
+		
+		self.Show = false
+		Service.ContextActionService:BindAction("Sense", function(action, state, object)
+			if action == "Sense" and state == Enum.UserInputState.End then
+				self.Show = not self.Show
+				for _, v in All do
+					v.Enabled = self.Show
+				end
+			end
+		end, false, Enum.KeyCode.Z)
+		
+		return `Enabled sense. Press Z to use.`, true
+	end
+})
+
 Executor.new({ -- Reload
 	Name = "Reload",
 	Description = "Reloads the command bar.",
@@ -2242,7 +2915,7 @@ Executor.new({ -- Protect
 
 Executor.new({ -- Spend
 	Name = "Spend",
-	Description = "Spend a number of skill points into a stat without clicking.",
+	Description = "Opens up the custom gui for spending points.",
 	Parameters = {},
 	Requirements = {},
 	Callback = function(self, context)
@@ -2294,9 +2967,9 @@ Executor.new({ -- Spend
 		end
 
 		if CustomGUI.Visible then
-			return `Opening Custom Skill Spendor`, true
+			return `Opening Custom Skill Spender`, true
 		else
-			return `Closing Custom Skill Spendor`, true
+			return `Closing Custom Skill Spender`, true
 		end
 		--if context == "run" and not args[1] then return `Specify a number.`, false end
 
@@ -2680,7 +3353,7 @@ Executor.new({ -- Waypoint
 Executor.new({ -- Follow
 	Name = "Follow",
 	Description = "Follow a player. Optional beans.",
-	Parameters = {`<action: on | off>`, `<player: name>`, `<bean: true?>`},
+	Parameters = {`<state: on | off>`, `<player: name>`, `<bean: true?>`},
 	Requirements = {},
 	Callback = function(self, context, args)
 		local action = args[1]
@@ -3201,7 +3874,8 @@ Executor.new({ -- Help
 		if context == "hint" then return {}, {} end
 		for _, Command in Library do
 			if not Command.Name then continue end
-			print(`{Command.Name} / {Command.Description} / {table.concat(Command.Parameters, " ")}`)
+			local Parameters = (#Command.Parameters > 0 and "/ " .. table.concat(Command.Parameters, " ")) or ""
+			print(`{Command.Name} / {Command.Description} {Parameters}`)
 		end
 		return `View console with "/console" or F9.`, true
 	end,
