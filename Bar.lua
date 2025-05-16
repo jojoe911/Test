@@ -1,5 +1,5 @@
-local BAR_VERSION = "1.1.6"
-local BAR_TIME = "5/9/2025 11:33 HST"
+local BAR_VERSION = "1.1.7"
+local BAR_TIME = "5/15/2025 8:06 HST"
 
 local Service = {
 	VirtualUser = game:GetService("VirtualUser"),
@@ -1749,8 +1749,13 @@ Executor.new({ -- Sense
 			
 			local SenseUI = {
 				["_Sense"] = Instance.new("BillboardGui");
-				["_Main"] = Instance.new("CanvasGroup");
+				["_Maximized"] = Instance.new("CanvasGroup");
 				["_Title"] = Instance.new("TextLabel");
+				["_UICorner"] = Instance.new("UICorner");
+				["_Health"] = Instance.new("Frame");
+				["_Overlap"] = Instance.new("Frame");
+				["_Rebirth"] = Instance.new("Frame");
+				["_UIGradient"] = Instance.new("UIGradient");
 				["_Stats"] = Instance.new("Frame");
 				["_UIGridLayout"] = Instance.new("UIGridLayout");
 				["_Health-Max"] = Instance.new("Frame");
@@ -1777,35 +1782,34 @@ Executor.new({ -- Sense
 				["_Overall"] = Instance.new("Frame");
 				["_Title8"] = Instance.new("TextLabel");
 				["_Val7"] = Instance.new("TextLabel");
-				["_Rebirth"] = Instance.new("Frame");
-				["_UIGradient"] = Instance.new("UIGradient");
-				["_UICorner"] = Instance.new("UICorner");
-				["_Health"] = Instance.new("Frame");
-				["_Overlap"] = Instance.new("Frame");
+				["_Minimized"] = Instance.new("CanvasGroup");
+				["_Title9"] = Instance.new("TextLabel");
+				["_UICorner1"] = Instance.new("UICorner");
+				["_Health1"] = Instance.new("Frame");
 			}
 
 			do
-				SenseUI["_Sense"].Enabled = self.Show
 				SenseUI["_Sense"].MaxDistance = (isPlayer and math.huge) or 50
+				SenseUI["_Sense"].Enabled = false
 				SenseUI["_Sense"].Active = true
 				SenseUI["_Sense"].Adornee = Head
 				SenseUI["_Sense"].AlwaysOnTop = true
 				SenseUI["_Sense"].ClipsDescendants = true
-				SenseUI["_Sense"].LightInfluence = 1
 				SenseUI["_Sense"].Size = UDim2.new(3, 300, 1, 100)
-				SenseUI["_Sense"].StudsOffset = Vector3.new(0, 3.5, 0)
 				SenseUI["_Sense"].SizeOffset = Vector2.new(0, 0.5)
+				SenseUI["_Sense"].StudsOffset = Vector3.new(0, 3, 3)
 				SenseUI["_Sense"].ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 				SenseUI["_Sense"].Name = "Sense"
 				SenseUI["_Sense"].Parent = Head
 
-				SenseUI["_Main"].BackgroundColor3 = Color3.fromRGB(20.000000707805157, 20.000000707805157, 20.000000707805157)
-				SenseUI["_Main"].BackgroundTransparency = 0.5
-				SenseUI["_Main"].BorderColor3 = Color3.fromRGB(0, 0, 0)
-				SenseUI["_Main"].BorderSizePixel = 0
-				SenseUI["_Main"].Size = UDim2.new(1, 0, 1, 0)
-				SenseUI["_Main"].Name = "Main"
-				SenseUI["_Main"].Parent = SenseUI["_Sense"]
+				SenseUI["_Maximized"].BackgroundColor3 = Color3.fromRGB(20.000000707805157, 20.000000707805157, 20.000000707805157)
+				SenseUI["_Maximized"].BackgroundTransparency = 0.5
+				SenseUI["_Maximized"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Maximized"].BorderSizePixel = 0
+				SenseUI["_Maximized"].Size = UDim2.new(1, 0, 1, 0)
+				SenseUI["_Maximized"].Visible = false
+				SenseUI["_Maximized"].Name = "Maximized"
+				SenseUI["_Maximized"].Parent = SenseUI["_Sense"]
 
 				SenseUI["_Title"].Font = Enum.Font.SourceSansBold
 				SenseUI["_Title"].Text = "[Lvl. 2000] Sucuretto"
@@ -1824,7 +1828,47 @@ Executor.new({ -- Sense
 				SenseUI["_Title"].Size = UDim2.new(0.951949596, 0, 0.230165675, 0)
 				SenseUI["_Title"].ZIndex = 2
 				SenseUI["_Title"].Name = "Title"
-				SenseUI["_Title"].Parent = SenseUI["_Main"]
+				SenseUI["_Title"].Parent = SenseUI["_Maximized"]
+
+				SenseUI["_UICorner"].CornerRadius = UDim.new(0, 5)
+				SenseUI["_UICorner"].Parent = SenseUI["_Maximized"]
+
+				SenseUI["_Health"].BackgroundColor3 = Color3.fromRGB(115.00000074505806, 255, 93.00000205636024)
+				SenseUI["_Health"].BackgroundTransparency = 0.5
+				SenseUI["_Health"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Health"].BorderSizePixel = 0
+				SenseUI["_Health"].Size = UDim2.new(0.999514759, 0, 0.319344938, 0)
+				SenseUI["_Health"].Name = "Health"
+				SenseUI["_Health"].Parent = SenseUI["_Maximized"]
+
+				SenseUI["_Overlap"].BackgroundColor3 = Color3.fromRGB(26.00000225007534, 26.00000225007534, 26.00000225007534)
+				SenseUI["_Overlap"].BackgroundTransparency = 0.5
+				SenseUI["_Overlap"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Overlap"].BorderSizePixel = 0
+				SenseUI["_Overlap"].Interactable = false
+				SenseUI["_Overlap"].Position = UDim2.new(0, 0, 0.325218081, 0)
+				SenseUI["_Overlap"].Size = UDim2.new(1, 0, 0.699999988, 0)
+				SenseUI["_Overlap"].ZIndex = 0
+				SenseUI["_Overlap"].Name = "Overlap"
+				SenseUI["_Overlap"].Parent = SenseUI["_Maximized"]
+
+				SenseUI["_Rebirth"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Rebirth"].BackgroundTransparency = 0.5
+				SenseUI["_Rebirth"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Rebirth"].BorderSizePixel = 0
+				SenseUI["_Rebirth"].Position = UDim2.new(0, 0, 0.325218081, 0)
+				SenseUI["_Rebirth"].Size = UDim2.new(1, 0, 0.699999988, 0)
+				SenseUI["_Rebirth"].Visible = false
+				SenseUI["_Rebirth"].ZIndex = 0
+				SenseUI["_Rebirth"].Name = "Rebirth"
+				SenseUI["_Rebirth"].Parent = SenseUI["_Maximized"]
+
+				SenseUI["_UIGradient"].Color = ColorSequence.new{
+					ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
+					ColorSequenceKeypoint.new(1, Color3.fromRGB(126.00000008940697, 126.00000008940697, 126.00000008940697))
+				}
+				SenseUI["_UIGradient"].Rotation = 90
+				SenseUI["_UIGradient"].Parent = SenseUI["_Rebirth"]
 
 				SenseUI["_Stats"].AnchorPoint = Vector2.new(0.5, 0.5)
 				SenseUI["_Stats"].BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -1834,7 +1878,7 @@ Executor.new({ -- Sense
 				SenseUI["_Stats"].Position = UDim2.new(0.500724852, 0, 0.664633155, 0)
 				SenseUI["_Stats"].Size = UDim2.new(0.950499713, 0, 0.524948657, 0)
 				SenseUI["_Stats"].Name = "Stats"
-				SenseUI["_Stats"].Parent = SenseUI["_Main"]
+				SenseUI["_Stats"].Parent = SenseUI["_Maximized"]
 
 				SenseUI["_UIGridLayout"].CellPadding = UDim2.new(0, 0, 0.100000001, 0)
 				SenseUI["_UIGridLayout"].CellSize = UDim2.new(0.25, 0, 0.485000014, 0)
@@ -2180,46 +2224,46 @@ Executor.new({ -- Sense
 				SenseUI["_Val7"].Name = "Val"
 				SenseUI["_Val7"].Parent = SenseUI["_Overall"]
 
-				SenseUI["_Rebirth"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-				SenseUI["_Rebirth"].BackgroundTransparency = 0.5
-				SenseUI["_Rebirth"].BorderColor3 = Color3.fromRGB(0, 0, 0)
-				SenseUI["_Rebirth"].BorderSizePixel = 0
-				SenseUI["_Rebirth"].Position = UDim2.new(0, 0, 0.325218081, 0)
-				SenseUI["_Rebirth"].Size = UDim2.new(1, 0, 0.699999988, 0)
-				SenseUI["_Rebirth"].Visible = false
-				SenseUI["_Rebirth"].ZIndex = 0
-				SenseUI["_Rebirth"].Name = "Rebirth"
-				SenseUI["_Rebirth"].Parent = SenseUI["_Main"]
+				SenseUI["_Minimized"].GroupTransparency = 0.800000011920929
+				SenseUI["_Minimized"].AnchorPoint = Vector2.new(0.5, 1)
+				SenseUI["_Minimized"].BackgroundColor3 = Color3.fromRGB(20.000000707805157, 20.000000707805157, 20.000000707805157)
+				SenseUI["_Minimized"].BackgroundTransparency = 0.5
+				SenseUI["_Minimized"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Minimized"].BorderSizePixel = 0
+				SenseUI["_Minimized"].Position = UDim2.new(0.5, 0, 1, 0)
+				SenseUI["_Minimized"].Size = UDim2.new(1, 0, 0.310000002, 0)
+				SenseUI["_Minimized"].Name = "Minimized"
+				SenseUI["_Minimized"].Parent = SenseUI["_Sense"]
 
-				SenseUI["_UIGradient"].Color = ColorSequence.new{
-					ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
-					ColorSequenceKeypoint.new(1, Color3.fromRGB(90, 90, 90))
-				}
-				SenseUI["_UIGradient"].Rotation = 90
-				SenseUI["_UIGradient"].Parent = SenseUI["_Rebirth"]
+				SenseUI["_Title9"].Font = Enum.Font.SourceSansBold
+				SenseUI["_Title9"].Text = "[Lvl. 2000] Sucuretto"
+				SenseUI["_Title9"].TextColor3 = Color3.fromRGB(255, 255, 0)
+				SenseUI["_Title9"].TextScaled = true
+				SenseUI["_Title9"].TextSize = 14
+				SenseUI["_Title9"].TextStrokeTransparency = 0
+				SenseUI["_Title9"].TextWrapped = true
+				SenseUI["_Title9"].TextXAlignment = Enum.TextXAlignment.Left
+				SenseUI["_Title9"].AnchorPoint = Vector2.new(0.5, 0.5)
+				SenseUI["_Title9"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				SenseUI["_Title9"].BackgroundTransparency = 1
+				SenseUI["_Title9"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Title9"].BorderSizePixel = 0
+				SenseUI["_Title9"].Position = UDim2.new(0.5, 0, 0.5, 0)
+				SenseUI["_Title9"].Size = UDim2.new(0.951949596, 0, 0.75, 0)
+				SenseUI["_Title9"].ZIndex = 2
+				SenseUI["_Title9"].Name = "Title"
+				SenseUI["_Title9"].Parent = SenseUI["_Minimized"]
 
-				SenseUI["_UICorner"].CornerRadius = UDim.new(0.0250000004, 0)
-				SenseUI["_UICorner"].Parent = SenseUI["_Main"]
+				SenseUI["_UICorner1"].CornerRadius = UDim.new(0, 5)
+				SenseUI["_UICorner1"].Parent = SenseUI["_Minimized"]
 
-				SenseUI["_Health"].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-				SenseUI["_Health"].BackgroundTransparency = 0.8
-				SenseUI["_Health"].BorderColor3 = Color3.fromRGB(0, 0, 0)
-				SenseUI["_Health"].BorderSizePixel = 0
-				SenseUI["_Health"].Size = UDim2.new(0.999514759, 0, 0.319344938, 0)
-				SenseUI["_Health"].Name = "Health"
-				SenseUI["_Health"].Parent = SenseUI["_Main"]
-
-				SenseUI["_Overlap"].BackgroundColor3 = Color3.fromRGB(26.00000225007534, 26.00000225007534, 26.00000225007534)
-				SenseUI["_Overlap"].BackgroundTransparency = 0.5
-				SenseUI["_Overlap"].BorderColor3 = Color3.fromRGB(0, 0, 0)
-				SenseUI["_Overlap"].BorderSizePixel = 0
-				SenseUI["_Overlap"].Interactable = false
-				SenseUI["_Overlap"].Position = UDim2.new(0, 0, 0.325218081, 0)
-				SenseUI["_Overlap"].Size = UDim2.new(1, 0, 0.699999988, 0)
-				SenseUI["_Overlap"].ZIndex = 0
-				SenseUI["_Overlap"].Name = "Overlap"
-				SenseUI["_Overlap"].Parent = SenseUI["_Main"]
-
+				SenseUI["_Health1"].BackgroundColor3 = Color3.fromRGB(115.00000074505806, 255, 93.00000205636024)
+				SenseUI["_Health1"].BackgroundTransparency = 0.5
+				SenseUI["_Health1"].BorderColor3 = Color3.fromRGB(0, 0, 0)
+				SenseUI["_Health1"].BorderSizePixel = 0
+				SenseUI["_Health1"].Size = UDim2.new(0.999514759, 0, 1, 0)
+				SenseUI["_Health1"].Name = "Health"
+				SenseUI["_Health1"].Parent = SenseUI["_Minimized"]
 			end
 			
 			local OG = target:FindFirstChild("Stats")
@@ -2267,9 +2311,12 @@ Executor.new({ -- Sense
 						SenseUI._Overlap.Visible = false
 						SenseUI._Rebirth.Visible = true
 					end
+					SenseUI._Title9.Text = `[{formatName(Namae)}] {tName}`
+					SenseUI._Title2.TextColor3 = Colors[Race.Value]
 					SenseUI._Title.Text = `[{formatName(Namae)}] {tName}`
 					SenseUI._Title.TextColor3 = Colors[Race.Value]
 				else
+					SenseUI._Title9.Text = tName
 					SenseUI._Title.Text = tName
 				end
 			end
@@ -2290,6 +2337,7 @@ Executor.new({ -- Sense
 			Humanoid.HealthChanged:Connect(function()
 				local MAX = Humanoid.MaxHealth
 				local HP = Humanoid.Health
+				SenseUI._Health1.Size = UDim2.new(HP/MAX, 0, 0.319344938, 0)
 				SenseUI._Health.Size = UDim2.new(HP/MAX, 0, 0.319344938, 0)
 			end)
 			
@@ -2315,14 +2363,60 @@ Executor.new({ -- Sense
 				newSense(child)
 			end)
 		end)
-		
+
+		local DETECTION_RADIUS = 500
+
+		local function getCharacterNearMouse()
+			local mouseRay = Camera:ScreenPointToRay(Mouse.X, Mouse.Y)
+			local rayOrigin = mouseRay.Origin
+			local rayDirection = mouseRay.Direction.Unit
+
+			local closestChar = nil
+			local closestDist = math.huge
+
+			for _, player in workspace.Live:GetChildren() do
+				if player.Name == User.Name then continue end
+				local hrp = player:FindFirstChild("HumanoidRootPart")
+				if hrp then
+					local point = hrp.Position
+					local originToPoint = point - rayOrigin
+					local projection = rayDirection:Dot(originToPoint)
+					local closestPoint = rayOrigin + rayDirection * projection
+					local distance = (closestPoint - point).Magnitude
+
+					if distance <= DETECTION_RADIUS and distance < closestDist then
+						closestChar = player
+						closestDist = distance
+					end
+				end
+			end
+
+			return closestChar
+		end
+
 		local Loops
 		Loops = Service.RunService.RenderStepped:Connect(function()
+			local char = getCharacterNearMouse()
+			
+			for _, player in workspace.Live:GetChildren() do
+				local sense: BillboardGui = player:FindFirstChild("Sense", true)
+				if not sense then continue end
+
+				if char and char == player then
+					sense.ZIndexBehavior = Enum.ZIndexBehavior.Global
+					sense.Maximized.Visible = true
+					sense.Minimized.Visible = false
+				else
+					sense.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+					sense.Maximized.Visible = false
+					sense.Minimized.Visible = true
+				end
+			end
+			
 			for _, child in workspace.Effects:GetChildren() do
 				if child.Name == "Senser" then child:Destroy() end
 			end
 		end)
-		
 		
 		Service.ContextActionService:BindAction("Sense", function(action, state, object)
 			if action == "Sense" and state == Enum.UserInputState.End then
